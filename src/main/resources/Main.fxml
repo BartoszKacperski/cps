@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<HBox prefHeight="800.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.bkpp.MainController">
+   <children>
+      <VBox prefHeight="200.0" prefWidth="100.0">
+         <children>
+            <ComboBox fx:id="signalChoiceBox" onAction="#onSignalChosen" prefHeight="25.0" prefWidth="100.0" />
+            <TextField fx:id="amplitude" promptText="Amplituda" />
+            <TextField fx:id="startTime" promptText="Czas początkowy" />
+            <TextField fx:id="duration" promptText="Czas trwania" />
+            <TextField fx:id="term" />
+            <Button fx:id="generate" mnemonicParsing="false" onAction="#generateSignal" prefHeight="25.0" prefWidth="120.0" text="Generuj" />
+         </children>
+      </VBox>
+      <LineChart fx:id="chart" prefHeight="800.0" prefWidth="900.0">
+        <xAxis>
+          <NumberAxis side="BOTTOM" />
+        </xAxis>
+        <yAxis>
+          <NumberAxis side="LEFT" />
+        </yAxis>
+      </LineChart>
+   </children>
+</HBox>
