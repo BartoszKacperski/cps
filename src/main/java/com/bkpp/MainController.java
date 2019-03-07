@@ -16,6 +16,8 @@ import java.util.ResourceBundle;
 
 public class MainController implements Initializable {
     @FXML
+    TextField fillFactor;
+    @FXML
     TextField amplitude;
     @FXML
     TextField startTime;
@@ -43,10 +45,15 @@ public class MainController implements Initializable {
     }
 
     public void onSignalChosen(ActionEvent actionEvent) {
-        if(signalChoiceBox.getValue() instanceof Signal){
+        if (signalChoiceBox.getValue() instanceof FillFactorSignal) {
+            fillFactor.setVisible(true);
             term.setVisible(true);
+        } else if (signalChoiceBox.getValue() instanceof Signal) {
+            term.setVisible(true);
+            fillFactor.setVisible(false);
         } else {
             term.setVisible(false);
+            fillFactor.setVisible(false);
         }
     }
 
@@ -54,36 +61,48 @@ public class MainController implements Initializable {
         signalChoiceBox.getItems().add(new UnvaryingNoise());
         signalChoiceBox.getItems().add(new GaussianNoise());
         signalChoiceBox.getItems().add(new SinusoidalSignal());
+        signalChoiceBox.getItems().add(new HalfStrightSinusoidalSignal());
+        signalChoiceBox.getItems().add(new StrightSinusoidalSignal());
+        signalChoiceBox.getItems().add(new RectangleSignal());
+        signalChoiceBox.getItems().add(new SymetricRectangleSignal());
     }
 
-    private Noise getInitializedPickedSignal(){
+    private Noise getInitializedPickedSignal() {
         Noise pickedSignal = signalChoiceBox.getValue();
 
         pickedSignal.setAmplitude(getAmplitude());
         pickedSignal.setDuration(getDuration());
         pickedSignal.setStartTime(getStartTime());
 
-        if(pickedSignal instanceof Signal){
-            ((Signal)pickedSignal).setTerm(getTerm());
+        if (pickedSignal instanceof Signal) {
+            ((Signal) pickedSignal).setTerm(getTerm());
+        }
+
+        if (pickedSignal instanceof FillFactorSignal) {
+            ((FillFactorSignal) pickedSignal).setFillFactor(getFillFactor());
         }
 
         return pickedSignal;
     }
 
-    private Double getAmplitude(){
+    private Double getAmplitude() {
         return Double.valueOf(amplitude.getText());
     }
 
-    private Double getStartTime(){
+    private Double getStartTime() {
         return Double.valueOf(startTime.getText());
     }
 
-    private Double getDuration(){
+    private Double getDuration() {
         return Double.valueOf(duration.getText());
     }
 
-    private Double getTerm(){
+    private Double getTerm() {
         return Double.valueOf(term.getText());
+    }
+
+    private Double getFillFactor() {
+        return Double.valueOf(fillFactor.getText());
     }
 
     private void clearChart() {
@@ -95,7 +114,7 @@ public class MainController implements Initializable {
 
         series.setName(signal.toString());
 
-        for(Point point : signal.getPoints()){
+        for (Point point : signal.getPoints()) {
             series.getData().add(new XYChart.Data<>(point.getX(), point.getY()));
         }
 
