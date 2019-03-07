@@ -1,6 +1,6 @@
 package com.bkpp.signals;
 
-public class TriangleSignal extends FillFactorSignal {
+public class TriangleContinuousSignal extends FillFactorContinuousSignal {
     @Override
     public Double getValue(Double t) {
         super.k = t.intValue();

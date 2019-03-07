@@ -1,6 +1,6 @@
 package com.bkpp.signals;
 
-public class UnitaryImpulse extends ExtendedNoise {
+public class UnitaryImpulse extends DiscreteSignal {
 
     @Override
     public Double getValue(Double t) {

@@ -3,13 +3,12 @@ package com.bkpp.signals;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
 @AllArgsConstructor
 
-public class UnitaryJump extends ExtendedNoise {
+public class UnitaryJump extends DiscreteSignal {
 
     @Override
     public Double getValue(Double t) {

@@ -7,7 +7,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 @AllArgsConstructor
 
-public class UnvaryingNoise extends Noise {
+public class UnvaryingNoise extends Signal {
 
     @Override
     public Double getValue(Double t) {

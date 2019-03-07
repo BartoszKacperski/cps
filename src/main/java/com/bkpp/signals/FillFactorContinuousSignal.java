@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 
-public abstract class ExtendedNoise extends Noise{
-    protected Double parameter;
+
+public abstract class FillFactorContinuousSignal extends ContinuousSignal {
+    protected Integer k = 1;
+    protected Double fillFactor;
 }

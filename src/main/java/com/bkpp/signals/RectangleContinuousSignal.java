@@ -1,6 +1,6 @@
 package com.bkpp.signals;
 
-public class SymetricRectangleSignal extends FillFactorSignal {
+public class RectangleContinuousSignal extends FillFactorContinuousSignal {
     @Override
     public Double getValue(Double t) {
         super.k = t.intValue();
@@ -10,7 +10,7 @@ public class SymetricRectangleSignal extends FillFactorSignal {
         if(checkIfNumberInRange(t, rangeStart, rangeEnd)){
             return super.amplitude;
         } else{
-            return -super.amplitude;
+            return 0.0;
         }
     }
 
@@ -20,6 +20,6 @@ public class SymetricRectangleSignal extends FillFactorSignal {
 
     @Override
     public String toString(){
-        return "Sygnal prostokatny symetryczny";
+        return "Sygnal prostokatny";
     }
 }

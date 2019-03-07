@@ -2,7 +2,7 @@ package com.bkpp.signals;
 
 import java.util.Random;
 
-public class GaussianNoise extends Noise {
+public class GaussianNoise extends Signal {
 
     @Override
     public Double getValue(Double t) {

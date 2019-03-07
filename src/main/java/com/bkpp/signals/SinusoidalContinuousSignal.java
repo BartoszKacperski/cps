@@ -1,15 +1,15 @@
 package com.bkpp.signals;
 
-public class StrightSinusoidalSignal extends Signal {
+public class SinusoidalContinuousSignal extends ContinuousSignal {
     @Override
     public Double getValue(Double t) {
         Double value =(2.0 * Math.PI) / super.term * (t - super.startTime);
 
-        return amplitude * Math.abs(Math.sin(value));
+        return super.amplitude * Math.sin(value);
     }
 
     @Override
     public String toString(){
-        return "Sygnal sinusoidalny wyprostowany dwupolowkowo";
+        return "Sygnal sinusoidalny";
     }
 }

@@ -11,9 +11,17 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
 public class MainController implements Initializable {
+    @FXML
+    Button add;
+    @FXML
+    ComboBox<Signal> firstSignals;
+    @FXML
+    ComboBox<Signal> secondSignals;
     @FXML
     Button clear;
     @FXML
@@ -35,7 +43,9 @@ public class MainController implements Initializable {
     @FXML
     LineChart<Double, Double> chart;
     @FXML
-    ComboBox<Noise> signalChoiceBox;
+    ComboBox<Signal> signalChoiceBox;
+
+    private List<Signal> generatedSignals = new ArrayList<>();
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -44,7 +54,7 @@ public class MainController implements Initializable {
 
 
     public void generateSignal(ActionEvent actionEvent) {
-        Noise pickedSignal = getInitializedPickedSignal();
+        Signal pickedSignal = getInitializedPickedSignal();
         fillChartWith(pickedSignal);
     }
 
@@ -52,12 +62,19 @@ public class MainController implements Initializable {
         clearChart();
     }
 
+    public void addSignals(ActionEvent actionEvent) {
+        Signal firstSignal = firstSignals.getValue();
+        Signal secondSignal = secondSignals.getValue();
+
+        fillChartWith(SignalOperationUtils.addition(firstSignal, secondSignal), "Dodawanie");
+    }
+
     public void onSignalChosen(ActionEvent actionEvent) {
-        if (signalChoiceBox.getValue() instanceof FillFactorSignal) {
+        if (signalChoiceBox.getValue() instanceof FillFactorContinuousSignal) {
             setTextsVisibility(true, true, false);
-        } else if (signalChoiceBox.getValue() instanceof Signal) {
+        } else if (signalChoiceBox.getValue() instanceof ContinuousSignal) {
             setTextsVisibility(false, true, false);
-        } else if (signalChoiceBox.getValue() instanceof ExtendedNoise) {
+        } else if (signalChoiceBox.getValue() instanceof DiscreteSignal) {
             setTextsVisibility(false, false, true);
 
             if (signalChoiceBox.getValue() instanceof UnitaryJump) {
@@ -81,41 +98,49 @@ public class MainController implements Initializable {
     private void initializeChoiceBox() {
         signalChoiceBox.getItems().add(new UnvaryingNoise());
         signalChoiceBox.getItems().add(new GaussianNoise());
-        signalChoiceBox.getItems().add(new SinusoidalSignal());
-        signalChoiceBox.getItems().add(new HalfStrightSinusoidalSignal());
-        signalChoiceBox.getItems().add(new StrightSinusoidalSignal());
-        signalChoiceBox.getItems().add(new RectangleSignal());
-        signalChoiceBox.getItems().add(new SymetricRectangleSignal());
-        signalChoiceBox.getItems().add(new TriangleSignal());
+        signalChoiceBox.getItems().add(new SinusoidalContinuousSignal());
+        signalChoiceBox.getItems().add(new HalfStrightSinusoidalContinuousSignal());
+        signalChoiceBox.getItems().add(new StraightSinusoidalContinuousSignal());
+        signalChoiceBox.getItems().add(new RectangleContinuousSignal());
+        signalChoiceBox.getItems().add(new SymetricRectangleContinuousSignal());
+        signalChoiceBox.getItems().add(new TriangleContinuousSignal());
         signalChoiceBox.getItems().add(new UnitaryJump());
         signalChoiceBox.getItems().add(new UnitaryImpulse());
         signalChoiceBox.getItems().add(new ImpulseNoise());
     }
 
-    private Noise getInitializedPickedSignal() {
-        Noise pickedSignal = signalChoiceBox.getValue();
+    private Signal getInitializedPickedSignal() {
+        Signal pickedSignal = signalChoiceBox.getValue();
 
         if (frequency.getText() != null && !frequency.getText().isEmpty()) {
-            pickedSignal.setSampling(getFrequency());
+            pickedSignal.setFrequency(getFrequency());
         }
 
         pickedSignal.setAmplitude(getAmplitude());
         pickedSignal.setDuration(getDuration());
         pickedSignal.setStartTime(getStartTime());
 
-        if (pickedSignal instanceof Signal) {
-            ((Signal) pickedSignal).setTerm(getTerm());
+        if (pickedSignal instanceof ContinuousSignal) {
+            ((ContinuousSignal) pickedSignal).setTerm(getTerm());
         }
 
-        if (pickedSignal instanceof FillFactorSignal) {
-            ((FillFactorSignal) pickedSignal).setFillFactor(getFillFactor());
+        if (pickedSignal instanceof FillFactorContinuousSignal) {
+            ((FillFactorContinuousSignal) pickedSignal).setFillFactor(getFillFactor());
         }
 
-        if (pickedSignal instanceof ExtendedNoise) {
-            ((ExtendedNoise) pickedSignal).setParameter(getParameter());
+        if (pickedSignal instanceof DiscreteSignal) {
+            ((DiscreteSignal) pickedSignal).setParameter(getParameter());
         }
+
+        saveSignal(pickedSignal);
 
         return pickedSignal;
+    }
+
+    private void saveSignal(Signal signal){
+        firstSignals.getItems().add(signal);
+        secondSignals.getItems().add(signal);
+        generatedSignals.add(signal);
     }
 
     private Double getAmplitude() {
@@ -150,7 +175,7 @@ public class MainController implements Initializable {
         chart.getData().clear();
     }
 
-    private void fillChartWith(Noise signal) {
+    private void fillChartWith(Signal signal) {
         XYChart.Series<Double, Double> series = new XYChart.Series<>();
 
         series.setName(signal.toString());
@@ -161,5 +186,18 @@ public class MainController implements Initializable {
 
         chart.getData().add(series);
     }
+
+    private void fillChartWith(List<Point> points, String name) {
+        XYChart.Series<Double, Double> series = new XYChart.Series<>();
+
+        series.setName(name);
+
+        for (Point point : points) {
+            series.getData().add(new XYChart.Data<>(point.getX(), point.getY()));
+        }
+
+        chart.getData().add(series);
+    }
+
 
 }

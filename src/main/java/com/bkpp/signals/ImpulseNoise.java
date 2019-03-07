@@ -2,7 +2,7 @@ package com.bkpp.signals;
 
 import java.util.concurrent.ThreadLocalRandom;
 
-public class ImpulseNoise extends ExtendedNoise {
+public class ImpulseNoise extends DiscreteSignal {
 
     @Override
     public Double getValue(Double t) {

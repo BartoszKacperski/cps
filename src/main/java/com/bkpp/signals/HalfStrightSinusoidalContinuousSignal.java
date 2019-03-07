@@ -1,6 +1,6 @@
 package com.bkpp.signals;
 
-public class HalfStrightSinusoidalSignal extends Signal {
+public class HalfStrightSinusoidalContinuousSignal extends ContinuousSignal {
     @Override
     public Double getValue(Double t) {
         Double value =(2.0 * Math.PI) / super.term * (t - super.startTime);
