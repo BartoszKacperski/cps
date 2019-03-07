@@ -7,7 +7,6 @@ import javafx.fxml.Initializable;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 
@@ -15,6 +14,12 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 public class MainController implements Initializable {
+    @FXML
+    Button clear;
+    @FXML
+    TextField frequency;
+    @FXML
+    TextField parameter;
     @FXML
     TextField fillFactor;
     @FXML
@@ -40,21 +45,37 @@ public class MainController implements Initializable {
 
     public void generateSignal(ActionEvent actionEvent) {
         Noise pickedSignal = getInitializedPickedSignal();
-        clearChart();
         fillChartWith(pickedSignal);
+    }
+
+    public void clearChart(ActionEvent actionEvent) {
+        clearChart();
     }
 
     public void onSignalChosen(ActionEvent actionEvent) {
         if (signalChoiceBox.getValue() instanceof FillFactorSignal) {
-            fillFactor.setVisible(true);
-            term.setVisible(true);
+            setTextsVisibility(true, true, false);
         } else if (signalChoiceBox.getValue() instanceof Signal) {
-            term.setVisible(true);
-            fillFactor.setVisible(false);
+            setTextsVisibility(false, true, false);
+        } else if (signalChoiceBox.getValue() instanceof ExtendedNoise) {
+            setTextsVisibility(false, false, true);
+
+            if (signalChoiceBox.getValue() instanceof UnitaryJump) {
+                parameter.setPromptText("Czas skoku");
+            } else if (signalChoiceBox.getValue() instanceof UnitaryImpulse) {
+                parameter.setPromptText("Numer probki");
+            } else {
+                parameter.setPromptText("Prawdopodobienstwo");
+            }
         } else {
-            term.setVisible(false);
-            fillFactor.setVisible(false);
+            setTextsVisibility(false, false, false);
         }
+    }
+
+    private void setTextsVisibility(boolean fillFactorVisibility, boolean termVisibility, boolean parameterVisibility) {
+        fillFactor.setVisible(fillFactorVisibility);
+        term.setVisible(termVisibility);
+        parameter.setVisible(parameterVisibility);
     }
 
     private void initializeChoiceBox() {
@@ -65,10 +86,18 @@ public class MainController implements Initializable {
         signalChoiceBox.getItems().add(new StrightSinusoidalSignal());
         signalChoiceBox.getItems().add(new RectangleSignal());
         signalChoiceBox.getItems().add(new SymetricRectangleSignal());
+        signalChoiceBox.getItems().add(new TriangleSignal());
+        signalChoiceBox.getItems().add(new UnitaryJump());
+        signalChoiceBox.getItems().add(new UnitaryImpulse());
+        signalChoiceBox.getItems().add(new ImpulseNoise());
     }
 
     private Noise getInitializedPickedSignal() {
         Noise pickedSignal = signalChoiceBox.getValue();
+
+        if (frequency.getText() != null && !frequency.getText().isEmpty()) {
+            pickedSignal.setSampling(getFrequency());
+        }
 
         pickedSignal.setAmplitude(getAmplitude());
         pickedSignal.setDuration(getDuration());
@@ -80,6 +109,10 @@ public class MainController implements Initializable {
 
         if (pickedSignal instanceof FillFactorSignal) {
             ((FillFactorSignal) pickedSignal).setFillFactor(getFillFactor());
+        }
+
+        if (pickedSignal instanceof ExtendedNoise) {
+            ((ExtendedNoise) pickedSignal).setParameter(getParameter());
         }
 
         return pickedSignal;
@@ -103,6 +136,14 @@ public class MainController implements Initializable {
 
     private Double getFillFactor() {
         return Double.valueOf(fillFactor.getText());
+    }
+
+    private Double getParameter() {
+        return Double.valueOf(parameter.getText());
+    }
+
+    private Double getFrequency() {
+        return Double.valueOf(frequency.getText());
     }
 
     private void clearChart() {

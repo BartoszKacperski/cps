@@ -11,7 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 
 public abstract class Noise {
-    protected final Double SAMPLING = 0.05;
+    protected Double sampling = 0.05;
     protected Double amplitude;
     protected Double startTime;
     protected Double duration;
@@ -25,7 +25,7 @@ public abstract class Noise {
     public List<Point> getPoints() {
         List<Point> values = new ArrayList<>();
 
-        for (double t = startTime; t < duration; t += SAMPLING) {
+        for (double t = startTime; t <= duration; t += sampling) {
             values.add(new Point(t, getValue(t)));
         }
 
