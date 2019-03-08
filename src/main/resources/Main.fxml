@@ -4,6 +4,7 @@
 <?import javafx.scene.chart.NumberAxis?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
@@ -11,9 +12,9 @@
 <HBox prefHeight="800.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.bkpp.MainController">
     <children>
-        <VBox prefHeight="200.0" prefWidth="100.0">
+        <VBox prefHeight="800.0" prefWidth="208.0">
             <children>
-                <ComboBox fx:id="signalChoiceBox" onAction="#onSignalChosen" prefHeight="25.0" prefWidth="100.0"/>
+                <ComboBox fx:id="signalChoiceBox" onAction="#onSignalChosen" prefHeight="25.0" prefWidth="160.0"/>
                 <TextField fx:id="frequency" promptText="Częstotliwość próbkowania"/>
                 <TextField fx:id="amplitude" promptText="Amplituda"/>
                 <TextField fx:id="startTime" promptText="Czas początkowy"/>
@@ -22,13 +23,15 @@
                 <TextField fx:id="fillFactor" promptText="Współczynnik wypełnienia" visible="false"/>
                 <TextField fx:id="parameter" visible="false"/>
                 <Button fx:id="generate" mnemonicParsing="false" onAction="#generateSignal" prefHeight="25.0"
-                        prefWidth="120.0" text="Generuj"/>
-                <Button fx:id="clear" mnemonicParsing="false" onAction="#clearChart" prefHeight="25.0" prefWidth="120.0"
+                        prefWidth="168.0" text="Generuj"/>
+                <Button fx:id="clear" mnemonicParsing="false" onAction="#clearChart" prefHeight="25.0" prefWidth="172.0"
                         text="Wyczysc"/>
-                <ComboBox fx:id="firstSignals" onAction="#onSignalChosen" prefHeight="25.0" prefWidth="100.0" />
-                <ComboBox fx:id="secondSignals" onAction="#onSignalChosen" prefHeight="25.0" prefWidth="100.0" />
-                <Button fx:id="add" mnemonicParsing="false" onAction="#addSignals" prefHeight="25.0" prefWidth="120.0"
+                <ComboBox fx:id="firstSignals" onAction="#onSignalChosen" prefHeight="25.0" prefWidth="166.0"/>
+                <ComboBox fx:id="secondSignals" onAction="#onSignalChosen" prefHeight="25.0" prefWidth="170.0"/>
+                <Button fx:id="add" mnemonicParsing="false" onAction="#addSignals" prefHeight="25.0" prefWidth="176.0"
                         text="Dodaj"/>
+                <Button fx:id="subtract" mnemonicParsing="false" onAction="#subtractSignals" prefHeight="25.0"
+                        prefWidth="160.0" text="Odejmij"/>
             </children>
         </VBox>
         <LineChart fx:id="chart" prefHeight="800.0" prefWidth="900.0">

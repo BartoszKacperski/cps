@@ -9,6 +9,7 @@ import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
+import org.apache.commons.lang3.SerializationUtils;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -16,6 +17,8 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 public class MainController implements Initializable {
+    @FXML
+    Button subtract;
     @FXML
     Button add;
     @FXML
@@ -67,6 +70,13 @@ public class MainController implements Initializable {
         Signal secondSignal = secondSignals.getValue();
 
         fillChartWith(SignalOperationUtils.addition(firstSignal, secondSignal), "Dodawanie");
+    }
+
+    public void subtractSignals(ActionEvent actionEvent) {
+        Signal firstSignal = firstSignals.getValue();
+        Signal secondSignal = secondSignals.getValue();
+
+        fillChartWith(SignalOperationUtils.subtraction(firstSignal, secondSignal), "Dodawanie");
     }
 
     public void onSignalChosen(ActionEvent actionEvent) {
@@ -132,14 +142,18 @@ public class MainController implements Initializable {
             ((DiscreteSignal) pickedSignal).setParameter(getParameter());
         }
 
+        pickedSignal.computePoints();
+
         saveSignal(pickedSignal);
 
         return pickedSignal;
     }
 
     private void saveSignal(Signal signal){
-        firstSignals.getItems().add(signal);
-        secondSignals.getItems().add(signal);
+        Signal signalCopy = SerializationUtils.clone(signal);
+
+        firstSignals.getItems().add(signalCopy);
+        secondSignals.getItems().add(signalCopy);
         generatedSignals.add(signal);
     }
 
@@ -178,7 +192,7 @@ public class MainController implements Initializable {
     private void fillChartWith(Signal signal) {
         XYChart.Series<Double, Double> series = new XYChart.Series<>();
 
-        series.setName(signal.toString());
+        series.setName(signal.toString() + " #"  +chart.getData().size());
 
         for (Point point : signal.getPoints()) {
             series.getData().add(new XYChart.Data<>(point.getX(), point.getY()));
@@ -198,6 +212,7 @@ public class MainController implements Initializable {
 
         chart.getData().add(series);
     }
+
 
 
 }
