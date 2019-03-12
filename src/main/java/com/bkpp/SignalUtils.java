@@ -6,9 +6,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class SignalOperationUtils {
+public class SignalUtils {
 
-    private SignalOperationUtils(){
+    private SignalUtils(){
 
     }
 
@@ -67,18 +67,18 @@ public class SignalOperationUtils {
             return Collections.emptyList();
         }
 
-        List<Point> difference = new ArrayList<>();
+        List<Point> product = new ArrayList<>();
 
         for(int i = 0; i < firstPoints.size(); i++){
             Point firstPoint = firstPoints.get(i);
             Point secondPoint = secondPoints.get(i);
 
             if(Math.abs(firstPoint.getX() - secondPoint.getX()) < 1E-10){
-                difference.add(new Point(firstPoint.getX(), firstPoint.getY() * secondPoint.getY()));
+                product.add(new Point(firstPoint.getX(), firstPoint.getY() * secondPoint.getY()));
             }
         }
 
-        return difference;
+        return product;
     }
 
     public static List<Point> division(Signal firstSignal, Signal secondSignal){
@@ -90,18 +90,86 @@ public class SignalOperationUtils {
             return Collections.emptyList();
         }
 
-        List<Point> difference = new ArrayList<>();
+        List<Point> quotient = new ArrayList<>();
 
         for(int i = 0; i < firstPoints.size(); i++){
             Point firstPoint = firstPoints.get(i);
             Point secondPoint = secondPoints.get(i);
 
-            if(Math.abs(firstPoint.getX() - secondPoint.getX()) < 1E-10){
-                difference.add(new Point(firstPoint.getX(), firstPoint.getY() / secondPoint.getY()));
+            if(Math.abs(firstPoint.getX() - secondPoint.getX()) < 1E-10 && secondPoint.getY() != 0){
+                quotient.add(new Point(firstPoint.getX(), firstPoint.getY() / secondPoint.getY()));
             }
         }
 
-        return difference;
+        return quotient;
+    }
+
+    public static double averageValue(Signal signal){
+        List<Point> points = signal.getPoints();
+        int firstValue = 0;
+        int lastValue = points.size();
+
+        double fraction = 1.0/(lastValue - firstValue + 1.0);
+
+        double sum = 0.0;
+
+        for(Point point : points){
+            sum += point.getY();
+        }
+
+        return fraction * sum;
+    }
+
+    public static double absoluteAverageValue(Signal signal){
+        List<Point> points = signal.getPoints();
+        int firstValue = 0;
+        int lastValue = points.size();
+
+        double fraction = 1.0/(lastValue - firstValue + 1.0);
+
+        double sum = 0.0;
+
+        for(Point point : points){
+            sum += Math.abs(point.getY());
+        }
+
+        return fraction * sum;
+    }
+
+    public static double power(Signal signal){
+        List<Point> points = signal.getPoints();
+        int firstValue = 0;
+        int lastValue = points.size();
+
+        double fraction = 1.0/(lastValue - firstValue + 1.0);
+
+        double sum = 0.0;
+
+        for(Point point : points){
+            sum += Math.pow(point.getY(), 2.0);
+        }
+
+        return fraction * sum;
+    }
+
+    public static double variance(Signal signal){
+        List<Point> points = signal.getPoints();
+        int firstValue = 0;
+        int lastValue = points.size();
+
+        double fraction = 1.0/(lastValue - firstValue + 1.0);
+        double avg = averageValue(signal);
+        double sum = 0.0;
+
+        for(Point point : points){
+            sum += Math.pow(point.getY() - avg, 2.0);
+        }
+
+        return fraction * sum;
+    }
+
+    public static double effectiveValue(Signal signal){
+        return Math.sqrt(power(signal));
     }
 
 }
