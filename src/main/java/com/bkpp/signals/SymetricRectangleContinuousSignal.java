@@ -19,7 +19,12 @@ public class SymetricRectangleContinuousSignal extends FillFactorContinuousSigna
     }
 
     @Override
-    public String toString(){
-        return "Sygnal prostokatny symetryczny";
+    public String toString() {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        stringBuilder.append("Sygnal prostokatny symetryczny").append(" ");
+        stringBuilder.append(super.toString());
+
+        return stringBuilder.toString();
     }
 }

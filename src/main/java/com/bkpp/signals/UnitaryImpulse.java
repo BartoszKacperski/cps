@@ -12,7 +12,12 @@ public class UnitaryImpulse extends DiscreteSignal {
     }
 
     @Override
-    public String toString(){
-        return "Impuls jednoskokowy";
+    public String toString() {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        stringBuilder.append("Impuls jednostkowy").append(" ");
+        stringBuilder.append(super.toString());
+
+        return stringBuilder.toString();
     }
 }

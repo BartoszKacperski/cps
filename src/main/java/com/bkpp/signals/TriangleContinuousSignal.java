@@ -19,7 +19,12 @@ public class TriangleContinuousSignal extends FillFactorContinuousSignal {
     }
 
     @Override
-    public String toString(){
-        return "Sygnal trojkatny";
+    public String toString() {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        stringBuilder.append("Sygnal trojkatny").append(" ");
+        stringBuilder.append(super.toString());
+
+        return stringBuilder.toString();
     }
 }

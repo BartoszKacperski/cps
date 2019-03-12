@@ -12,11 +12,16 @@ import javafx.fxml.FXMLLoader;
  */
 public class App extends Application
 {
+    private static Stage primaryStage;
+
     public static void main( String[] args )
     {
         launch();
     }
 
+    public static Stage getPrimaryStage() {
+        return primaryStage;
+    }
 
     @Override
     public void start(Stage stage) throws Exception {
@@ -28,5 +33,6 @@ public class App extends Application
         stage.setResizable(false);
         stage.setTitle("CPS Pawel Pomaranski & Bartosz Kacperski");
         stage.show();
+        primaryStage = stage;
     }
 }

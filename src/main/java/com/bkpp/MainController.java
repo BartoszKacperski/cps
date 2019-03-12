@@ -6,17 +6,34 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
+import javafx.stage.FileChooser;
 import org.apache.commons.lang3.SerializationUtils;
 
+import java.io.*;
 import java.net.URL;
-import java.util.ArrayList;
+import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.List;
 import java.util.ResourceBundle;
 
 public class MainController implements Initializable {
+    @FXML
+    ComboBox<Signal> signalsToSave;
+    @FXML
+    Button saveSignal;
+    @FXML
+    Button loadSignal;
+    @FXML
+    Label avgValue;
+    @FXML
+    Label absoluteAvgValue;
+    @FXML
+    Label power;
+    @FXML
+    Label variance;
+    @FXML
+    Label effectiveValue;
     @FXML
     Button multiply;
     @FXML
@@ -50,64 +67,80 @@ public class MainController implements Initializable {
     @FXML
     LineChart<Double, Double> chart;
     @FXML
-    ComboBox<Signal> signalChoiceBox;
+    ComboBox<String> signalChoiceBox;
 
-    private List<Signal> generatedSignals = new ArrayList<>();
+    private HashMap<String, Signal> signalNames;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        initializeSignalsName();
         initializeChoiceBox();
     }
 
+    public void saveSignal(ActionEvent actionEvent) {
+        Signal pickedSignal = signalNames.get(signalChoiceBox.getValue());
+        saveSignalToFile(pickedSignal);
+    }
+
+    public void loadSignal(ActionEvent actionEvent) {
+        loadSignalFromFile();
+    }
 
     public void generateSignal(ActionEvent actionEvent) {
-        Signal pickedSignal = getInitializedPickedSignal();
-        fillChartWith(pickedSignal);
+        try{
+            Signal pickedSignal = getInitializedPickedSignal();
+            fillChartWith(pickedSignal);
+            fillValuesWith(pickedSignal);
+        } catch(NumberFormatException e){
+            showErrorDialog("Bledne dane wejsciowe");
+        }
     }
 
     public void clearChart(ActionEvent actionEvent) {
         clearChart();
+        clearGeneratedSignals();
     }
 
     public void addSignals(ActionEvent actionEvent) {
         Signal firstSignal = firstSignals.getValue();
         Signal secondSignal = secondSignals.getValue();
 
-        fillChartWith(SignalOperationUtils.addition(firstSignal, secondSignal), "Dodawanie");
+        fillChartWith(SignalUtils.addition(firstSignal, secondSignal), "Dodawanie");
     }
 
     public void subtractSignals(ActionEvent actionEvent) {
         Signal firstSignal = firstSignals.getValue();
         Signal secondSignal = secondSignals.getValue();
 
-        fillChartWith(SignalOperationUtils.subtraction(firstSignal, secondSignal), "Dodawanie");
+        fillChartWith(SignalUtils.subtraction(firstSignal, secondSignal), "Odejmowanie");
     }
 
     public void multiplySignals(ActionEvent actionEvent) {
         Signal firstSignal = firstSignals.getValue();
         Signal secondSignal = secondSignals.getValue();
 
-        fillChartWith(SignalOperationUtils.multiplication(firstSignal, secondSignal), "Dodawanie");
+        fillChartWith(SignalUtils.multiplication(firstSignal, secondSignal), "Mnozenie");
     }
 
     public void divideSignals(ActionEvent actionEvent) {
         Signal firstSignal = firstSignals.getValue();
         Signal secondSignal = secondSignals.getValue();
 
-        fillChartWith(SignalOperationUtils.division(firstSignal, secondSignal), "Dodawanie");
+        fillChartWith(SignalUtils.division(firstSignal, secondSignal), "Dzielenie");
     }
 
     public void onSignalChosen(ActionEvent actionEvent) {
-        if (signalChoiceBox.getValue() instanceof FillFactorContinuousSignal) {
+        Signal pickedSignal = signalNames.get(signalChoiceBox.getValue());
+        if (pickedSignal instanceof FillFactorContinuousSignal) {
             setTextsVisibility(true, true, false);
-        } else if (signalChoiceBox.getValue() instanceof ContinuousSignal) {
+        } else if (pickedSignal instanceof ContinuousSignal) {
             setTextsVisibility(false, true, false);
-        } else if (signalChoiceBox.getValue() instanceof DiscreteSignal) {
+        } else if (pickedSignal instanceof DiscreteSignal) {
             setTextsVisibility(false, false, true);
 
-            if (signalChoiceBox.getValue() instanceof UnitaryJump) {
+            if (pickedSignal instanceof UnitaryJump) {
                 parameter.setPromptText("Czas skoku");
-            } else if (signalChoiceBox.getValue() instanceof UnitaryImpulse) {
+            } else if (pickedSignal instanceof UnitaryImpulse) {
                 parameter.setPromptText("Numer probki");
             } else {
                 parameter.setPromptText("Prawdopodobienstwo");
@@ -123,22 +156,30 @@ public class MainController implements Initializable {
         parameter.setVisible(parameterVisibility);
     }
 
-    private void initializeChoiceBox() {
-        signalChoiceBox.getItems().add(new UnvaryingNoise());
-        signalChoiceBox.getItems().add(new GaussianNoise());
-        signalChoiceBox.getItems().add(new SinusoidalContinuousSignal());
-        signalChoiceBox.getItems().add(new HalfStrightSinusoidalContinuousSignal());
-        signalChoiceBox.getItems().add(new StraightSinusoidalContinuousSignal());
-        signalChoiceBox.getItems().add(new RectangleContinuousSignal());
-        signalChoiceBox.getItems().add(new SymetricRectangleContinuousSignal());
-        signalChoiceBox.getItems().add(new TriangleContinuousSignal());
-        signalChoiceBox.getItems().add(new UnitaryJump());
-        signalChoiceBox.getItems().add(new UnitaryImpulse());
-        signalChoiceBox.getItems().add(new ImpulseNoise());
+    private void initializeSignalsName() {
+        signalNames = new HashMap<>();
+
+        signalNames.put("Szum o rozkladzie jednostajnym", new UnvaryingNoise());
+        signalNames.put("Szum gaussowski", new GaussianNoise());
+        signalNames.put("Sygnal sinusoidalny", new SinusoidalContinuousSignal());
+        signalNames.put("Sygnal sinusoidalny wyprostowany jednopolowkowo", new HalfStrightSinusoidalContinuousSignal());
+        signalNames.put("Sygnal sinusoidalny wyprostowany dwupolowkowo", new StraightSinusoidalContinuousSignal());
+        signalNames.put("Sygnal prostokatny", new RectangleContinuousSignal());
+        signalNames.put("Sygnal prostokatny symetryczny", new SymetricRectangleContinuousSignal());
+        signalNames.put("Sygnal trojkatny", new TriangleContinuousSignal());
+        signalNames.put("Skok jednostkowy", new UnitaryJump());
+        signalNames.put("Impuls jednostkowy", new UnitaryImpulse());
+        signalNames.put("Szum impulsowy", new ImpulseNoise());
+    }
+
+    private void initializeChoiceBox(){
+        for(String name : signalNames.keySet()){
+            signalChoiceBox.getItems().add(name);
+        }
     }
 
     private Signal getInitializedPickedSignal() {
-        Signal pickedSignal = signalChoiceBox.getValue();
+        Signal pickedSignal = signalNames.get(signalChoiceBox.getValue());
 
         if (frequency.getText() != null && !frequency.getText().isEmpty()) {
             pickedSignal.setFrequency(getFrequency());
@@ -170,9 +211,35 @@ public class MainController implements Initializable {
     private void saveSignal(Signal signal){
         Signal signalCopy = SerializationUtils.clone(signal);
 
+        System.out.println(signalCopy.toString());
+
         firstSignals.getItems().add(signalCopy);
         secondSignals.getItems().add(signalCopy);
-        generatedSignals.add(signal);
+        signalsToSave.getItems().add(signalCopy);
+    }
+
+    private void clearGeneratedSignals(){
+        firstSignals.getItems().clear();
+        secondSignals.getItems().clear();
+        signalsToSave.getItems().clear();
+    }
+
+    private void saveSignalToFile(Signal signal){
+        try(FileOutputStream fileOutputStream = new FileOutputStream(chooseFile().getAbsolutePath());) {
+            SerializationUtils.serialize(signal, fileOutputStream);
+        } catch (IOException e) {
+            showErrorDialog("Nie udalo sie zapisac sygnalu do pliku");
+        }
+    }
+
+    private void loadSignalFromFile(){
+        try(FileInputStream fileInputStream = new FileInputStream(chooseFile().getAbsolutePath())) {
+            Signal signal = SerializationUtils.deserialize(fileInputStream);
+            fillChartWith(signal);
+            fillValuesWith(signal);
+        } catch (IOException e) {
+            showErrorDialog("Nie udalo się zaladowac sygnalu");
+        }
     }
 
     private Double getAmplitude() {
@@ -203,6 +270,14 @@ public class MainController implements Initializable {
         return Double.valueOf(frequency.getText());
     }
 
+    private void fillValuesWith(Signal signal){
+        avgValue.setText(String.format("Wartosc srednia %g", SignalUtils.averageValue(signal)));
+        absoluteAvgValue.setText(String.format("Bez. wart. srednia %g", SignalUtils.absoluteAverageValue(signal)));
+        power.setText(String.format("Moc %g", SignalUtils.power(signal)));
+        variance.setText(String.format("Wariacja %g", SignalUtils.variance(signal)));
+        effectiveValue.setText(String.format("Wartosc skuteczna %g", SignalUtils.effectiveValue(signal)));
+    }
+
     private void clearChart() {
         chart.getData().clear();
     }
@@ -231,6 +306,20 @@ public class MainController implements Initializable {
         chart.getData().add(series);
     }
 
+    private File chooseFile(){
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Wybierz plik");
+        File defaultDirectory = new File(Paths.get(".").toAbsolutePath().normalize().toString());
+        chooser.setInitialDirectory(defaultDirectory);
+        return chooser.showOpenDialog(App.getPrimaryStage());
+    }
 
+    private void showErrorDialog(String message){
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText("Ooops, pojawil sie problem!");
+        alert.setContentText(message);
 
+        alert.showAndWait();
+    }
 }

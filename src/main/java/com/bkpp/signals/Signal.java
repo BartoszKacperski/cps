@@ -6,7 +6,6 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @Data
@@ -37,20 +36,25 @@ public abstract class Signal implements Serializable {
         }
     }
 
-    public List<Point> computeAndGetPoints(){
-        computePoints();
-
-        return points;
-    }
-
     public List<Point> getPoints() {
         if(points == null){
-            //TODO
-            return Collections.emptyList();
+           computePoints();
         }
-        
+
         return points;
     }
 
     public abstract Double getValue(Double t);
+
+    @Override
+    public String toString(){
+        StringBuilder stringBuilder = new StringBuilder();
+
+        stringBuilder.append("Czest.: ").append(frequency).append(" ");
+        stringBuilder.append("Ampl.: ").append(amplitude).append(" ");
+        stringBuilder.append("Czas start.: ").append(startTime).append(" ");
+        stringBuilder.append("Czas: ").append(duration);
+
+        return stringBuilder.toString();
+    }
 }

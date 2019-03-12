@@ -16,7 +16,12 @@ public class UnvaryingNoise extends Signal {
 
     @Override
     public String toString() {
-        return "Szum o rozkladzie jednostajnym";
+        StringBuilder stringBuilder = new StringBuilder();
+
+        stringBuilder.append("Szum o rozkładzie jednostajnym").append(" ");
+        stringBuilder.append(super.toString());
+
+        return stringBuilder.toString();
     }
 
 }

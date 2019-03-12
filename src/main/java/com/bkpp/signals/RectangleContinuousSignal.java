@@ -19,7 +19,12 @@ public class RectangleContinuousSignal extends FillFactorContinuousSignal {
     }
 
     @Override
-    public String toString(){
-        return "Sygnal prostokatny";
+    public String toString() {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        stringBuilder.append("Sygnal prostokatny").append(" ");
+        stringBuilder.append(super.toString());
+
+        return stringBuilder.toString();
     }
 }

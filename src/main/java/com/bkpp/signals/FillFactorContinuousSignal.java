@@ -10,6 +10,16 @@ import lombok.NoArgsConstructor;
 
 
 public abstract class FillFactorContinuousSignal extends ContinuousSignal {
-    protected Integer k = 1;
+    protected Integer k;
     protected Double fillFactor;
+
+    @Override
+    public String toString() {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        stringBuilder.append("Wsp. wyp.: ").append(fillFactor).append(" ");
+        stringBuilder.append(super.toString());
+
+        return stringBuilder.toString();
+    }
 }

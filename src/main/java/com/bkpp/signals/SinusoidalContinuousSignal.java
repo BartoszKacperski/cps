@@ -9,7 +9,12 @@ public class SinusoidalContinuousSignal extends ContinuousSignal {
     }
 
     @Override
-    public String toString(){
-        return "Sygnal sinusoidalny";
+    public String toString() {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        stringBuilder.append("Sygnal sinusoidalny").append(" ");
+        stringBuilder.append(super.toString());
+
+        return stringBuilder.toString();
     }
 }

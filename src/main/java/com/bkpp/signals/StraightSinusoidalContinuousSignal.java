@@ -9,7 +9,12 @@ public class StraightSinusoidalContinuousSignal extends ContinuousSignal {
     }
 
     @Override
-    public String toString(){
-        return "Sygnal sinusoidalny wyprostowany dwupolowkowo";
+    public String toString() {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        stringBuilder.append("Sygnal sinusoidalny wyprostowany dwupolowkowo").append(" ");
+        stringBuilder.append(super.toString());
+
+        return stringBuilder.toString();
     }
 }

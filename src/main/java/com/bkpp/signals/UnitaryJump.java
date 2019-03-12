@@ -24,7 +24,12 @@ public class UnitaryJump extends DiscreteSignal {
     }
 
     @Override
-    public String toString(){
-        return "Skok jednostkowy";
+    public String toString() {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        stringBuilder.append("Skok jednostkowy").append(" ");
+        stringBuilder.append(super.toString());
+
+        return stringBuilder.toString();
     }
 }

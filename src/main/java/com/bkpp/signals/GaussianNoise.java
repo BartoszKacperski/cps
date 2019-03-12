@@ -12,7 +12,12 @@ public class GaussianNoise extends Signal {
     }
 
     @Override
-    public String toString(){
-        return "Szum gaussowski";
+    public String toString() {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        stringBuilder.append("Szum gaussowski").append(" ");
+        stringBuilder.append(super.toString());
+
+        return stringBuilder.toString();
     }
 }

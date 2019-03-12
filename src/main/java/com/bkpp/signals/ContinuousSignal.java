@@ -11,4 +11,14 @@ import lombok.NoArgsConstructor;
 
 public abstract class ContinuousSignal extends Signal {
     protected Double term;
+
+    @Override
+    public String toString() {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        stringBuilder.append("Okres: ").append(term).append(" ");
+        stringBuilder.append(super.toString());
+
+        return stringBuilder.toString();
+    }
 }

@@ -12,7 +12,12 @@ public class HalfStrightSinusoidalContinuousSignal extends ContinuousSignal {
     }
 
     @Override
-    public String toString(){
-        return "Sygnal sinusoidalny wyprostowany jednopolowkowo";
+    public String toString() {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        stringBuilder.append("Sygnal sinusoidalny wyprostowany jednopolowkowo").append(" ");
+        stringBuilder.append(super.toString());
+
+        return stringBuilder.toString();
     }
 }

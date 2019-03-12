@@ -16,7 +16,13 @@ public class ImpulseNoise extends DiscreteSignal {
     }
 
     @Override
-    public String toString(){
-        return "Szum impulsowy";
+    public String toString() {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        stringBuilder.append("Szum impulsowy").append(" ");
+        stringBuilder.append(super.toString());
+
+        return stringBuilder.toString();
     }
+
 }

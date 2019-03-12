@@ -9,42 +9,47 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<HBox prefHeight="800.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="com.bkpp.MainController">
+<HBox prefHeight="800.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.bkpp.MainController">
     <children>
-        <VBox prefHeight="800.0" prefWidth="208.0">
+        <VBox prefHeight="800.0" prefWidth="159.0">
             <children>
-                <ComboBox fx:id="signalChoiceBox" onAction="#onSignalChosen" prefHeight="25.0" prefWidth="160.0"/>
-                <TextField fx:id="frequency" promptText="Częstotliwość próbkowania"/>
-                <TextField fx:id="amplitude" promptText="Amplituda"/>
-                <TextField fx:id="startTime" promptText="Czas początkowy"/>
-                <TextField fx:id="duration" promptText="Czas trwania"/>
-                <TextField fx:id="term" promptText="Okres" visible="false"/>
-                <TextField fx:id="fillFactor" promptText="Współczynnik wypełnienia" visible="false"/>
-                <TextField fx:id="parameter" visible="false"/>
-                <Button fx:id="generate" mnemonicParsing="false" onAction="#generateSignal" prefHeight="25.0"
-                        prefWidth="168.0" text="Generuj"/>
-                <Button fx:id="clear" mnemonicParsing="false" onAction="#clearChart" prefHeight="25.0" prefWidth="172.0"
-                        text="Wyczysc"/>
-                <ComboBox fx:id="firstSignals" onAction="#onSignalChosen" prefHeight="25.0" prefWidth="166.0"/>
-                <ComboBox fx:id="secondSignals" onAction="#onSignalChosen" prefHeight="25.0" prefWidth="170.0"/>
-                <Button fx:id="add" mnemonicParsing="false" onAction="#addSignals" prefHeight="25.0" prefWidth="176.0"
-                        text="Dodaj"/>
-                <Button fx:id="subtract" mnemonicParsing="false" onAction="#subtractSignals" prefHeight="25.0"
-                        prefWidth="160.0" text="Odejmij"/>
-                <Button fx:id="divide" mnemonicParsing="false" onAction="#divideSignals" prefHeight="25.0"
-                        prefWidth="160.0" text="Podziel"/>
-                <Button fx:id="multiply" mnemonicParsing="false" onAction="#multiplySignals" prefHeight="25.0"
-                        prefWidth="160.0" text="Pomnóż"/>
+                <ComboBox fx:id="signalsToSave" prefHeight="25.0" prefWidth="228.0" />
+                <Button fx:id="saveSignal" mnemonicParsing="false" onAction="#saveSignal" prefHeight="25.0" prefWidth="229.0" text="Zapisz" />
+                <Button fx:id="loadSignal" mnemonicParsing="false" onAction="#loadSignal" prefHeight="25.0" prefWidth="229.0" text="Wczytaj" />
+                <ComboBox fx:id="signalChoiceBox" onAction="#onSignalChosen" prefHeight="25.0" prefWidth="160.0" />
+                <TextField fx:id="frequency" promptText="Częstotliwość próbkowania" />
+                <TextField fx:id="amplitude" promptText="Amplituda" />
+                <TextField fx:id="startTime" promptText="Czas początkowy" />
+                <TextField fx:id="duration" promptText="Czas trwania" />
+                <TextField fx:id="term" promptText="Okres" visible="false" />
+                <TextField fx:id="fillFactor" promptText="Współczynnik wypełnienia" visible="false" />
+                <TextField fx:id="parameter" visible="false" />
+                <Button fx:id="generate" mnemonicParsing="false" onAction="#generateSignal" prefHeight="25.0" prefWidth="168.0" text="Generuj" />
+                <Button fx:id="clear" mnemonicParsing="false" onAction="#clearChart" prefHeight="25.0" prefWidth="172.0" text="Wyczysc" />
+                <ComboBox fx:id="firstSignals" prefHeight="25.0" prefWidth="228.0" />
+                <ComboBox fx:id="secondSignals" prefHeight="25.0" prefWidth="210.0" />
+                <Button fx:id="add" mnemonicParsing="false" onAction="#addSignals" prefHeight="25.0" prefWidth="262.0" text="Dodaj" />
+                <Button fx:id="subtract" mnemonicParsing="false" onAction="#subtractSignals" prefHeight="25.0" prefWidth="213.0" text="Odejmij" />
+                <Button fx:id="divide" mnemonicParsing="false" onAction="#divideSignals" prefHeight="25.0" prefWidth="243.0" text="Podziel" />
+                <Button fx:id="multiply" mnemonicParsing="false" onAction="#multiplySignals" prefHeight="25.0" prefWidth="229.0" text="Pomnóż" />
             </children>
         </VBox>
-        <LineChart fx:id="chart" prefHeight="800.0" prefWidth="900.0">
-            <xAxis>
-                <NumberAxis side="BOTTOM"/>
-            </xAxis>
-            <yAxis>
-                <NumberAxis side="LEFT"/>
-            </yAxis>
-        </LineChart>
+        <VBox prefHeight="200.0" prefWidth="800.0">
+            <HBox prefHeight="50.0" prefWidth="200.0">
+                <Label fx:id="avgValue" prefHeight="54.0" prefWidth="159.0" text="Wartosc srednia" />
+                <Label fx:id="absoluteAvgValue" prefHeight="46.0" prefWidth="159.0" text="Bez. wart srednia" />
+                <Label fx:id="power" prefHeight="36.0" prefWidth="159.0" text="Moc" />
+                <Label fx:id="variance" prefHeight="44.0" prefWidth="159.0" text="Wariacja" />
+                <Label fx:id="effectiveValue" prefHeight="52.0" prefWidth="159.0" text="Wartosc skuteczna" />
+            </HBox>
+            <LineChart fx:id="chart" prefHeight="784.0" prefWidth="603.0">
+                <xAxis>
+                    <NumberAxis side="BOTTOM" />
+                </xAxis>
+                <yAxis>
+                    <NumberAxis side="LEFT" />
+                </yAxis>
+            </LineChart>
+        </VBox>
     </children>
 </HBox>
