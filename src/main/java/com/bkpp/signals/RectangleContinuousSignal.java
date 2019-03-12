@@ -3,7 +3,7 @@ package com.bkpp.signals;
 public class RectangleContinuousSignal extends FillFactorContinuousSignal {
     @Override
     public Double getValue(Double t) {
-        super.k = t.intValue();
+        super.k = (int)(t/term);
         Double rangeStart =  super.k * term + super.startTime;
         Double rangeEnd = super.term * (super.fillFactor + super.k) + startTime;
 
