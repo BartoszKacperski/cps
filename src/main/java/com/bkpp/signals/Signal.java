@@ -31,7 +31,7 @@ public abstract class Signal implements Serializable {
         double currentTime = 0.0;
 
         for(int i = 0; currentTime < startTime + duration; i++){
-            currentTime = (double)i/frequency;
+            currentTime = this.startTime + (double)i/frequency;
             Point point = new Point(currentTime, getValue(currentTime));
             points.add(point);
         }
