@@ -58,4 +58,50 @@ public class SignalOperationUtils {
         return difference;
     }
 
+    public static List<Point> multiplication(Signal firstSignal, Signal secondSignal){
+        List<Point> firstPoints = firstSignal.getPoints();
+        List<Point> secondPoints = secondSignal.getPoints();
+
+        if(firstPoints.size() != secondPoints.size()){
+            //TODO
+            return Collections.emptyList();
+        }
+
+        List<Point> difference = new ArrayList<>();
+
+        for(int i = 0; i < firstPoints.size(); i++){
+            Point firstPoint = firstPoints.get(i);
+            Point secondPoint = secondPoints.get(i);
+
+            if(Math.abs(firstPoint.getX() - secondPoint.getX()) < 1E-10){
+                difference.add(new Point(firstPoint.getX(), firstPoint.getY() * secondPoint.getY()));
+            }
+        }
+
+        return difference;
+    }
+
+    public static List<Point> division(Signal firstSignal, Signal secondSignal){
+        List<Point> firstPoints = firstSignal.getPoints();
+        List<Point> secondPoints = secondSignal.getPoints();
+
+        if(firstPoints.size() != secondPoints.size()){
+            //TODO
+            return Collections.emptyList();
+        }
+
+        List<Point> difference = new ArrayList<>();
+
+        for(int i = 0; i < firstPoints.size(); i++){
+            Point firstPoint = firstPoints.get(i);
+            Point secondPoint = secondPoints.get(i);
+
+            if(Math.abs(firstPoint.getX() - secondPoint.getX()) < 1E-10){
+                difference.add(new Point(firstPoint.getX(), firstPoint.getY() / secondPoint.getY()));
+            }
+        }
+
+        return difference;
+    }
+
 }

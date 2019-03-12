@@ -48,7 +48,7 @@ public abstract class Signal implements Serializable {
             //TODO
             return Collections.emptyList();
         }
-
+        
         return points;
     }
 

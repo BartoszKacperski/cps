@@ -18,6 +18,10 @@ import java.util.ResourceBundle;
 
 public class MainController implements Initializable {
     @FXML
+    Button multiply;
+    @FXML
+    Button divide;
+    @FXML
     Button subtract;
     @FXML
     Button add;
@@ -77,6 +81,20 @@ public class MainController implements Initializable {
         Signal secondSignal = secondSignals.getValue();
 
         fillChartWith(SignalOperationUtils.subtraction(firstSignal, secondSignal), "Dodawanie");
+    }
+
+    public void multiplySignals(ActionEvent actionEvent) {
+        Signal firstSignal = firstSignals.getValue();
+        Signal secondSignal = secondSignals.getValue();
+
+        fillChartWith(SignalOperationUtils.multiplication(firstSignal, secondSignal), "Dodawanie");
+    }
+
+    public void divideSignals(ActionEvent actionEvent) {
+        Signal firstSignal = firstSignals.getValue();
+        Signal secondSignal = secondSignals.getValue();
+
+        fillChartWith(SignalOperationUtils.division(firstSignal, secondSignal), "Dodawanie");
     }
 
     public void onSignalChosen(ActionEvent actionEvent) {

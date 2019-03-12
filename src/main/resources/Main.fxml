@@ -32,6 +32,10 @@
                         text="Dodaj"/>
                 <Button fx:id="subtract" mnemonicParsing="false" onAction="#subtractSignals" prefHeight="25.0"
                         prefWidth="160.0" text="Odejmij"/>
+                <Button fx:id="divide" mnemonicParsing="false" onAction="#divideSignals" prefHeight="25.0"
+                        prefWidth="160.0" text="Podziel"/>
+                <Button fx:id="multiply" mnemonicParsing="false" onAction="#multiplySignals" prefHeight="25.0"
+                        prefWidth="160.0" text="Pomnóż"/>
             </children>
         </VBox>
         <LineChart fx:id="chart" prefHeight="800.0" prefWidth="900.0">
