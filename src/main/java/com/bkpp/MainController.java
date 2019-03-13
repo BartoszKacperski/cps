@@ -3,11 +3,14 @@ package com.bkpp;
 import com.bkpp.signals.*;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import org.apache.commons.lang3.SerializationUtils;
 
 import java.io.*;
@@ -91,6 +94,7 @@ public class MainController implements Initializable {
             Signal pickedSignal = getInitializedPickedSignal();
             fillChartWith(pickedSignal);
             fillValuesWith(pickedSignal);
+            this.openHistogram(pickedSignal.getPoints());
         } catch(NumberFormatException e){
             showErrorDialog("Bledne dane wejsciowe");
         }
@@ -321,5 +325,16 @@ public class MainController implements Initializable {
         alert.setContentText(message);
 
         alert.showAndWait();
+    }
+
+    private void openHistogram(List<Point> points) {
+        Stage stage = new Stage();
+
+        Scene scene = new Scene(new HistogramController(points));
+
+        stage.setScene(scene);
+        stage.setResizable(false);
+        stage.setTitle("CPS Pawel Pomaranski & Bartosz Kacperski");
+        stage.show();
     }
 }
