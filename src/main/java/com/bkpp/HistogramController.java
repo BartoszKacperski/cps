@@ -57,6 +57,7 @@ public class HistogramController extends BorderPane {
 
     private void initializeChart(int numberOfRanges) {
         barChart.getData().clear();
+        this.xAxis.getCategories().clear();
 
         BarChart.Series<String, Number> series = new XYChart.Series<>();
 
