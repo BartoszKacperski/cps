@@ -1,6 +1,7 @@
 package com.bkpp;
 
 import com.bkpp.histogram.Histogram;
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.chart.BarChart;
@@ -11,17 +12,23 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
 
 public class HistogramController extends BorderPane {
 
     @FXML
-    BarChart<String, Number> barChart;
+    private BarChart<String, Number> barChart;
 
     @FXML
-    TextField textField;
+    private CategoryAxis xAxis;
+
+    @FXML
+    private TextField textField;
+
 
     private List<Point> points;
+
 
     public HistogramController(List<Point> points) {
         this.points = points;
@@ -56,9 +63,14 @@ public class HistogramController extends BorderPane {
         Histogram histogram = new Histogram(this.points, numberOfRanges);
         int[] values = histogram.getValues();
 
+        List<String> categories = new LinkedList<>();
+
         for (int i = 0; i < values.length; i++) {
             series.getData().add(new XYChart.Data<>(Integer.valueOf(i).toString(), values[i]));
+            categories.add(Integer.valueOf(i).toString());
         }
+
+        this.xAxis.setCategories(FXCollections.observableList(categories));
 
         barChart.getData().add(series);
     }
