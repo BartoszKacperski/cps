@@ -7,6 +7,7 @@ import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 
 import java.io.IOException;
@@ -18,10 +19,7 @@ public class HistogramController extends BorderPane {
     BarChart<String, Number> barChart;
 
     @FXML
-    CategoryAxis xAxis;
-
-    @FXML
-    NumberAxis yAxis;
+    TextField textField;
 
     private List<Point> points;
 
@@ -41,12 +39,21 @@ public class HistogramController extends BorderPane {
     }
 
     @FXML
-    private void initialize() {
+    public void onChange() {
+        try {
+            int numberOfRanges = Integer.valueOf(this.textField.getText());
+            this.initializeChart(numberOfRanges);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void initializeChart(int numberOfRanges) {
+        barChart.getData().clear();
+
         BarChart.Series<String, Number> series = new XYChart.Series<>();
 
-
-        //TODO modify number
-        Histogram histogram = new Histogram(this.points, 2);
+        Histogram histogram = new Histogram(this.points, numberOfRanges);
         int[] values = histogram.getValues();
 
         for (int i = 0; i < values.length; i++) {
