@@ -35,12 +35,12 @@
             </children>
         </VBox>
         <VBox prefHeight="200.0" prefWidth="800.0">
-            <HBox prefHeight="50.0" prefWidth="200.0">
-                <Label fx:id="avgValue" prefHeight="54.0" prefWidth="159.0" text="Wartosc srednia" />
-                <Label fx:id="absoluteAvgValue" prefHeight="46.0" prefWidth="159.0" text="Bez. wart srednia" />
-                <Label fx:id="power" prefHeight="36.0" prefWidth="159.0" text="Moc" />
-                <Label fx:id="variance" prefHeight="44.0" prefWidth="159.0" text="Wariacja" />
-                <Label fx:id="effectiveValue" prefHeight="52.0" prefWidth="159.0" text="Wartosc skuteczna" />
+            <HBox prefHeight="60.0" prefWidth="200.0">
+                <Label fx:id="avgValue" wrapText="true" prefHeight="60.0" prefWidth="160.0" text="Wartosc srednia " />
+                <Label fx:id="absoluteAvgValue" wrapText="true"  prefHeight="60.0" prefWidth="160.0" text="Bez. wart srednia" />
+                <Label fx:id="power" wrapText="true"  prefHeight="60.0" prefWidth="160.0" text="Moc" />
+                <Label fx:id="variance" wrapText="true"  prefHeight="60.0" prefWidth="160.0" text="Wariacja" />
+                <Label fx:id="effectiveValue" wrapText="true"  prefHeight="60.0" prefWidth="160.0" text="Wartosc skuteczna" />
             </HBox>
             <LineChart fx:id="chart" prefHeight="784.0" prefWidth="603.0">
                 <xAxis>
