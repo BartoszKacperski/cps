@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 
 
-public abstract class FillFactorContinuousSignal extends ContinuousSignal {
+public abstract class FillFactorTermSignal extends TermSignal {
     protected Integer k;
     protected Double fillFactor;
 

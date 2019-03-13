@@ -1,18 +1,21 @@
 package com.bkpp.signals;
 
-public class SinusoidalContinuousSignal extends ContinuousSignal {
+public class HalfStrightSinusoidalSignal extends TermSignal {
     @Override
     public Double getValue(Double t) {
         Double value =(2.0 * Math.PI) / super.term * (t - super.startTime);
 
-        return super.amplitude * Math.sin(value);
+        Double firstSinus = Math.sin(value);
+        Double secondSinus = Math.abs(firstSinus);
+
+        return 0.5 * amplitude * (firstSinus + secondSinus);
     }
 
     @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
 
-        stringBuilder.append("Sygnal sinusoidalny").append(" ");
+        stringBuilder.append("Sygnal sinusoidalny wyprostowany jednopolowkowo").append(" ");
         stringBuilder.append(super.toString());
 
         return stringBuilder.toString();

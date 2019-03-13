@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 
-public abstract class ContinuousSignal extends Signal {
+public abstract class TermSignal extends Signal {
     protected Double term;
 
     @Override
