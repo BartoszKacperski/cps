@@ -17,13 +17,20 @@
                 <Button fx:id="saveSignal" mnemonicParsing="false" onAction="#saveSignal" prefHeight="25.0" prefWidth="229.0" text="Zapisz" />
                 <Button fx:id="loadSignal" mnemonicParsing="false" onAction="#loadSignal" prefHeight="25.0" prefWidth="229.0" text="Wczytaj" />
                 <ComboBox fx:id="signalChoiceBox" onAction="#onSignalChosen" prefHeight="25.0" prefWidth="160.0" />
+                <Label prefWidth="170.0" text="Częstotliwość próbkowania" textAlignment="CENTER" />
                 <TextField fx:id="frequency" promptText="Częstotliwość próbkowania" />
+                <Label prefWidth="170.0" text="Amplituda" textAlignment="CENTER" />
                 <TextField fx:id="amplitude" promptText="Amplituda" />
+                <Label prefWidth="170.0" text="Czas początkowy" textAlignment="CENTER" />
                 <TextField fx:id="startTime" promptText="Czas początkowy" />
+                <Label prefWidth="170.0" text="Czas trwania" textAlignment="CENTER" />
                 <TextField fx:id="duration" promptText="Czas trwania" />
-                <TextField fx:id="term" promptText="Okres" visible="false" />
-                <TextField fx:id="fillFactor" promptText="Współczynnik wypełnienia" visible="false" />
-                <TextField fx:id="parameter" visible="false" />
+                <Label prefWidth="170.0" text="Okres" textAlignment="CENTER" />
+                <TextField fx:id="term" promptText="Okres" />
+                <Label prefWidth="170.0" text="Współczynnik wypełnienia" textAlignment="CENTER" />
+                <TextField fx:id="fillFactor" promptText="Współczynnik wypełnienia"/>
+                <Label fx:id="parameterLabel" prefWidth="170.0" textAlignment="CENTER" />
+                <TextField fx:id="parameter" />
                 <Button fx:id="generate" mnemonicParsing="false" onAction="#generateSignal" prefHeight="25.0" prefWidth="168.0" text="Generuj" />
                 <Button fx:id="clear" mnemonicParsing="false" onAction="#clearChart" prefHeight="25.0" prefWidth="172.0" text="Wyczysc" />
                 <ComboBox fx:id="firstSignals" prefHeight="25.0" prefWidth="228.0" />
@@ -36,11 +43,11 @@
         </VBox>
         <VBox prefHeight="200.0" prefWidth="800.0">
             <HBox prefHeight="60.0" prefWidth="200.0">
-                <Label fx:id="avgValue" wrapText="true" prefHeight="60.0" prefWidth="160.0" text="Wartosc srednia " />
-                <Label fx:id="absoluteAvgValue" wrapText="true"  prefHeight="60.0" prefWidth="160.0" text="Bez. wart srednia" />
-                <Label fx:id="power" wrapText="true"  prefHeight="60.0" prefWidth="160.0" text="Moc" />
-                <Label fx:id="variance" wrapText="true"  prefHeight="60.0" prefWidth="160.0" text="Wariacja" />
-                <Label fx:id="effectiveValue" wrapText="true"  prefHeight="60.0" prefWidth="160.0" text="Wartosc skuteczna" />
+                <Label fx:id="avgValue" prefHeight="60.0" prefWidth="160.0" text="Wartosc srednia " wrapText="true" />
+                <Label fx:id="absoluteAvgValue" prefHeight="60.0" prefWidth="160.0" text="Bez. wart srednia" wrapText="true" />
+                <Label fx:id="power" prefHeight="60.0" prefWidth="160.0" text="Moc" wrapText="true" />
+                <Label fx:id="variance" prefHeight="60.0" prefWidth="160.0" text="Wariacja" wrapText="true" />
+                <Label fx:id="effectiveValue" prefHeight="60.0" prefWidth="160.0" text="Wartosc skuteczna" wrapText="true" />
             </HBox>
             <LineChart fx:id="chart" prefHeight="784.0" prefWidth="603.0">
                 <xAxis>

@@ -21,6 +21,8 @@ import java.util.ResourceBundle;
 
 public class MainController implements Initializable {
     @FXML
+    Label parameterLabel;
+    @FXML
     ComboBox<Signal> signalsToSave;
     @FXML
     Button saveSignal;
@@ -89,10 +91,10 @@ public class MainController implements Initializable {
     }
 
     public void generateSignal(ActionEvent actionEvent) {
-        try{
+        try {
             Signal pickedSignal = getInitializedPickedSignal();
             fillGuiWith(pickedSignal);
-        } catch(NumberFormatException e){
+        } catch (NumberFormatException e) {
             showErrorDialog("Bledne dane wejsciowe");
         }
     }
@@ -132,30 +134,21 @@ public class MainController implements Initializable {
 
     public void onSignalChosen(ActionEvent actionEvent) {
         Signal pickedSignal = signalNames.get(signalChoiceBox.getValue());
-        if (pickedSignal instanceof FillFactorTermSignal) {
-            setTextsVisibility(true, true, false);
-        } else if (pickedSignal instanceof TermSignal) {
-            setTextsVisibility(false, true, false);
-        } else if (pickedSignal instanceof DiscreteSignal) {
-            setTextsVisibility(false, false, true);
 
-            if (pickedSignal instanceof UnitaryJump) {
-                parameter.setPromptText("Czas skoku");
-            } else if (pickedSignal instanceof UnitaryImpulse) {
-                parameter.setPromptText("Numer probki");
-            } else {
-                parameter.setPromptText("Prawdopodobienstwo");
-            }
+        if (pickedSignal instanceof UnitaryJump) {
+            parameter.setPromptText("Czas skoku");
+            parameterLabel.setText("Czas skoku");
+        } else if (pickedSignal instanceof UnitaryImpulse) {
+            parameter.setPromptText("Numer probki");
+            parameterLabel.setText("Numer probki");
         } else {
-            setTextsVisibility(false, false, false);
+            parameter.setPromptText("Prawdopodobienstwo");
+            parameterLabel.setText("Prawdopodobienstwo");
         }
+
     }
 
-    private void setTextsVisibility(boolean fillFactorVisibility, boolean termVisibility, boolean parameterVisibility) {
-        fillFactor.setVisible(fillFactorVisibility);
-        term.setVisible(termVisibility);
-        parameter.setVisible(parameterVisibility);
-    }
+
 
     private void initializeSignalsName() {
         signalNames = new HashMap<>();
@@ -173,8 +166,8 @@ public class MainController implements Initializable {
         signalNames.put("Szum impulsowy", new ImpulseNoise());
     }
 
-    private void initializeChoiceBox(){
-        for(String name : signalNames.keySet()){
+    private void initializeChoiceBox() {
+        for (String name : signalNames.keySet()) {
             signalChoiceBox.getItems().add(name);
         }
     }
@@ -209,7 +202,7 @@ public class MainController implements Initializable {
         return pickedSignal;
     }
 
-    private void saveSignal(Signal signal){
+    private void saveSignal(Signal signal) {
         Signal signalCopy = SerializationUtils.clone(signal);
 
         firstSignals.getItems().add(signalCopy);
@@ -217,22 +210,22 @@ public class MainController implements Initializable {
         signalsToSave.getItems().add(signalCopy);
     }
 
-    private void clearGeneratedSignals(){
+    private void clearGeneratedSignals() {
         firstSignals.getItems().clear();
         secondSignals.getItems().clear();
         signalsToSave.getItems().clear();
     }
 
-    private void saveSignalToFile(Signal signal){
-        try(FileOutputStream fileOutputStream = new FileOutputStream(chooseFile().getAbsolutePath());) {
+    private void saveSignalToFile(Signal signal) {
+        try (FileOutputStream fileOutputStream = new FileOutputStream(chooseFile().getAbsolutePath());) {
             SerializationUtils.serialize(signal, fileOutputStream);
         } catch (IOException e) {
             showErrorDialog("Nie udalo sie zapisac sygnalu do pliku");
         }
     }
 
-    private void loadSignalFromFile(){
-        try(FileInputStream fileInputStream = new FileInputStream(chooseFile().getAbsolutePath())) {
+    private void loadSignalFromFile() {
+        try (FileInputStream fileInputStream = new FileInputStream(chooseFile().getAbsolutePath())) {
             Signal signal = SerializationUtils.deserialize(fileInputStream);
             fillGuiWith(signal);
         } catch (IOException e) {
@@ -268,13 +261,13 @@ public class MainController implements Initializable {
         return Double.valueOf(frequency.getText());
     }
 
-    private void fillGuiWith(Signal signal){
+    private void fillGuiWith(Signal signal) {
         fillChartWith(signal);
         fillValuesWith(signal);
         this.openHistogram(signal.getPoints());
     }
 
-    private void fillValuesWith(Signal signal){
+    private void fillValuesWith(Signal signal) {
         avgValue.setText(String.format("Wartosc srednia \n %g", SignalUtils.averageValue(signal)));
         absoluteAvgValue.setText(String.format("Bez. wart. srednia \n %g", SignalUtils.absoluteAverageValue(signal)));
         power.setText(String.format("Moc \n %g", SignalUtils.power(signal)));
@@ -289,7 +282,7 @@ public class MainController implements Initializable {
     private void fillChartWith(Signal signal) {
         XYChart.Series<Double, Double> series = new XYChart.Series<>();
 
-        series.setName(signal.toString() + " #"  +chart.getData().size());
+        series.setName(signal.toString() + " #" + chart.getData().size());
 
         for (Point point : signal.getPoints()) {
             series.getData().add(new XYChart.Data<>(point.getX(), point.getY()));
@@ -310,7 +303,7 @@ public class MainController implements Initializable {
         chart.getData().add(series);
     }
 
-    private File chooseFile(){
+    private File chooseFile() {
         FileChooser chooser = new FileChooser();
         chooser.setTitle("Wybierz plik");
         File defaultDirectory = new File(Paths.get(".").toAbsolutePath().normalize().toString());
@@ -318,7 +311,7 @@ public class MainController implements Initializable {
         return chooser.showOpenDialog(App.getPrimaryStage());
     }
 
-    private void showErrorDialog(String message){
+    private void showErrorDialog(String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Error");
         alert.setHeaderText("Ooops, pojawil sie problem!");
