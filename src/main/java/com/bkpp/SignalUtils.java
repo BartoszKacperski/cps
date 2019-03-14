@@ -1,10 +1,12 @@
 package com.bkpp;
 
 import com.bkpp.signals.Signal;
+import com.bkpp.signals.TermSignal;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class SignalUtils {
 
@@ -15,15 +17,9 @@ public class SignalUtils {
     public static List<Point> addition(Signal firstSignal, Signal secondSignal){
         List<Point> firstPoints = firstSignal.getPoints();
         List<Point> secondPoints = secondSignal.getPoints();
-
-        if(firstPoints.size() != secondPoints.size()){
-            //TODO
-            return Collections.emptyList();
-        }
-
         List<Point> sum = new ArrayList<>();
 
-        for(int i = 0; i < firstPoints.size(); i++){
+        for(int i = 0; i < firstPoints.size() && i < secondPoints.size(); i++){
             Point firstPoint = firstPoints.get(i);
             Point secondPoint = secondPoints.get(i);
 
@@ -38,15 +34,9 @@ public class SignalUtils {
     public static List<Point> subtraction(Signal firstSignal, Signal secondSignal){
         List<Point> firstPoints = firstSignal.getPoints();
         List<Point> secondPoints = secondSignal.getPoints();
-
-        if(firstPoints.size() != secondPoints.size()){
-            //TODO
-            return Collections.emptyList();
-        }
-
         List<Point> difference = new ArrayList<>();
 
-        for(int i = 0; i < firstPoints.size(); i++){
+        for(int i = 0; i < firstPoints.size() && i < secondPoints.size(); i++){
             Point firstPoint = firstPoints.get(i);
             Point secondPoint = secondPoints.get(i);
 
@@ -61,15 +51,9 @@ public class SignalUtils {
     public static List<Point> multiplication(Signal firstSignal, Signal secondSignal){
         List<Point> firstPoints = firstSignal.getPoints();
         List<Point> secondPoints = secondSignal.getPoints();
-
-        if(firstPoints.size() != secondPoints.size()){
-            //TODO
-            return Collections.emptyList();
-        }
-
         List<Point> product = new ArrayList<>();
 
-        for(int i = 0; i < firstPoints.size(); i++){
+        for(int i = 0; i < firstPoints.size() && i < secondPoints.size(); i++){
             Point firstPoint = firstPoints.get(i);
             Point secondPoint = secondPoints.get(i);
 
@@ -84,15 +68,9 @@ public class SignalUtils {
     public static List<Point> division(Signal firstSignal, Signal secondSignal){
         List<Point> firstPoints = firstSignal.getPoints();
         List<Point> secondPoints = secondSignal.getPoints();
-
-        if(firstPoints.size() != secondPoints.size()){
-            //TODO
-            return Collections.emptyList();
-        }
-
         List<Point> quotient = new ArrayList<>();
 
-        for(int i = 0; i < firstPoints.size(); i++){
+        for(int i = 0; i < firstPoints.size() && i < secondPoints.size(); i++){
             Point firstPoint = firstPoints.get(i);
             Point secondPoint = secondPoints.get(i);
 
@@ -104,8 +82,19 @@ public class SignalUtils {
         return quotient;
     }
 
+    private static List<Point> adjustPointsIfTermSignal(Signal signal){
+        if(signal instanceof TermSignal){
+            TermSignal termSignal = (TermSignal)signal;
+            final double lastXInTerm = ((int)(termSignal.getDuration()/termSignal.getTerm()) * termSignal.getTerm());
+
+            return signal.getPoints().stream().filter(point -> point.getX() <= lastXInTerm).collect(Collectors.toList());
+        } else {
+            return signal.getPoints();
+        }
+    }
+
     public static double averageValue(Signal signal){
-        List<Point> points = signal.getPoints();
+        List<Point> points = adjustPointsIfTermSignal(signal);
         int firstValue = 0;
         int lastValue = points.size();
 
@@ -121,7 +110,7 @@ public class SignalUtils {
     }
 
     public static double absoluteAverageValue(Signal signal){
-        List<Point> points = signal.getPoints();
+        List<Point> points = adjustPointsIfTermSignal(signal);
         int firstValue = 0;
         int lastValue = points.size();
 
@@ -137,7 +126,7 @@ public class SignalUtils {
     }
 
     public static double power(Signal signal){
-        List<Point> points = signal.getPoints();
+        List<Point> points = adjustPointsIfTermSignal(signal);
         int firstValue = 0;
         int lastValue = points.size();
 
@@ -153,7 +142,7 @@ public class SignalUtils {
     }
 
     public static double variance(Signal signal){
-        List<Point> points = signal.getPoints();
+        List<Point> points = adjustPointsIfTermSignal(signal);
         int firstValue = 0;
         int lastValue = points.size();
 

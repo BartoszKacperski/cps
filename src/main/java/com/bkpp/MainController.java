@@ -3,7 +3,6 @@ package com.bkpp;
 import com.bkpp.signals.*;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.chart.LineChart;
@@ -92,9 +91,7 @@ public class MainController implements Initializable {
     public void generateSignal(ActionEvent actionEvent) {
         try{
             Signal pickedSignal = getInitializedPickedSignal();
-            fillChartWith(pickedSignal);
-            fillValuesWith(pickedSignal);
-            this.openHistogram(pickedSignal.getPoints());
+            fillGuiWith(pickedSignal);
         } catch(NumberFormatException e){
             showErrorDialog("Bledne dane wejsciowe");
         }
@@ -135,9 +132,9 @@ public class MainController implements Initializable {
 
     public void onSignalChosen(ActionEvent actionEvent) {
         Signal pickedSignal = signalNames.get(signalChoiceBox.getValue());
-        if (pickedSignal instanceof FillFactorContinuousSignal) {
+        if (pickedSignal instanceof FillFactorTermSignal) {
             setTextsVisibility(true, true, false);
-        } else if (pickedSignal instanceof ContinuousSignal) {
+        } else if (pickedSignal instanceof TermSignal) {
             setTextsVisibility(false, true, false);
         } else if (pickedSignal instanceof DiscreteSignal) {
             setTextsVisibility(false, false, true);
@@ -165,12 +162,12 @@ public class MainController implements Initializable {
 
         signalNames.put("Szum o rozkladzie jednostajnym", new UnvaryingNoise());
         signalNames.put("Szum gaussowski", new GaussianNoise());
-        signalNames.put("Sygnal sinusoidalny", new SinusoidalContinuousSignal());
-        signalNames.put("Sygnal sinusoidalny wyprostowany jednopolowkowo", new HalfStrightSinusoidalContinuousSignal());
-        signalNames.put("Sygnal sinusoidalny wyprostowany dwupolowkowo", new StraightSinusoidalContinuousSignal());
-        signalNames.put("Sygnal prostokatny", new RectangleContinuousSignal());
-        signalNames.put("Sygnal prostokatny symetryczny", new SymetricRectangleContinuousSignal());
-        signalNames.put("Sygnal trojkatny", new TriangleContinuousSignal());
+        signalNames.put("Sygnal sinusoidalny", new SinusoidalSignal());
+        signalNames.put("Sygnal sinusoidalny wyprostowany jednopolowkowo", new HalfStrightSinusoidalSignal());
+        signalNames.put("Sygnal sinusoidalny wyprostowany dwupolowkowo", new StraightSinusoidalSignal());
+        signalNames.put("Sygnal prostokatny", new RectangleSignal());
+        signalNames.put("Sygnal prostokatny symetryczny", new SymetricRectangleSignal());
+        signalNames.put("Sygnal trojkatny", new TriangleSignal());
         signalNames.put("Skok jednostkowy", new UnitaryJump());
         signalNames.put("Impuls jednostkowy", new UnitaryImpulse());
         signalNames.put("Szum impulsowy", new ImpulseNoise());
@@ -193,12 +190,12 @@ public class MainController implements Initializable {
         pickedSignal.setDuration(getDuration());
         pickedSignal.setStartTime(getStartTime());
 
-        if (pickedSignal instanceof ContinuousSignal) {
-            ((ContinuousSignal) pickedSignal).setTerm(getTerm());
+        if (pickedSignal instanceof TermSignal) {
+            ((TermSignal) pickedSignal).setTerm(getTerm());
         }
 
-        if (pickedSignal instanceof FillFactorContinuousSignal) {
-            ((FillFactorContinuousSignal) pickedSignal).setFillFactor(getFillFactor());
+        if (pickedSignal instanceof FillFactorTermSignal) {
+            ((FillFactorTermSignal) pickedSignal).setFillFactor(getFillFactor());
         }
 
         if (pickedSignal instanceof DiscreteSignal) {
@@ -214,8 +211,6 @@ public class MainController implements Initializable {
 
     private void saveSignal(Signal signal){
         Signal signalCopy = SerializationUtils.clone(signal);
-
-        System.out.println(signalCopy.toString());
 
         firstSignals.getItems().add(signalCopy);
         secondSignals.getItems().add(signalCopy);
@@ -239,8 +234,7 @@ public class MainController implements Initializable {
     private void loadSignalFromFile(){
         try(FileInputStream fileInputStream = new FileInputStream(chooseFile().getAbsolutePath())) {
             Signal signal = SerializationUtils.deserialize(fileInputStream);
-            fillChartWith(signal);
-            fillValuesWith(signal);
+            fillGuiWith(signal);
         } catch (IOException e) {
             showErrorDialog("Nie udalo się zaladowac sygnalu");
         }
@@ -274,12 +268,18 @@ public class MainController implements Initializable {
         return Double.valueOf(frequency.getText());
     }
 
+    private void fillGuiWith(Signal signal){
+        fillChartWith(signal);
+        fillValuesWith(signal);
+        this.openHistogram(signal.getPoints());
+    }
+
     private void fillValuesWith(Signal signal){
-        avgValue.setText(String.format("Wartosc srednia %g", SignalUtils.averageValue(signal)));
-        absoluteAvgValue.setText(String.format("Bez. wart. srednia %g", SignalUtils.absoluteAverageValue(signal)));
-        power.setText(String.format("Moc %g", SignalUtils.power(signal)));
-        variance.setText(String.format("Wariacja %g", SignalUtils.variance(signal)));
-        effectiveValue.setText(String.format("Wartosc skuteczna %g", SignalUtils.effectiveValue(signal)));
+        avgValue.setText(String.format("Wartosc srednia \n %g", SignalUtils.averageValue(signal)));
+        absoluteAvgValue.setText(String.format("Bez. wart. srednia \n %g", SignalUtils.absoluteAverageValue(signal)));
+        power.setText(String.format("Moc \n %g", SignalUtils.power(signal)));
+        variance.setText(String.format("Wariacja \n %g", SignalUtils.variance(signal)));
+        effectiveValue.setText(String.format("Wartosc skuteczna \n %g", SignalUtils.effectiveValue(signal)));
     }
 
     private void clearChart() {
