@@ -12,6 +12,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -56,7 +57,7 @@ public class HistogramController extends BorderPane {
     }
 
     private void initializeChart(int numberOfRanges) {
-        barChart.getData().clear();
+        this.barChart.getData().clear();
         this.xAxis.getCategories().clear();
 
         BarChart.Series<String, Number> series = new XYChart.Series<>();
@@ -67,13 +68,24 @@ public class HistogramController extends BorderPane {
         List<String> categories = new LinkedList<>();
 
         for (int i = 0; i < values.length; i++) {
-            series.getData().add(new XYChart.Data<>(Integer.valueOf(i).toString(), values[i]));
-            categories.add(Integer.valueOf(i).toString());
+            String label = this.getLabel(i , histogram);
+            series.getData().add(new XYChart.Data<>(label, values[i]));
+            categories.add(label);
         }
 
         this.xAxis.setCategories(FXCollections.observableList(categories));
 
-        barChart.getData().add(series);
+        this.barChart.getData().add(series);
+    }
+
+    private String getLabel(int i, Histogram histogram) {
+        DecimalFormat decimalFormat = new DecimalFormat("#.##");
+        return new StringBuilder()
+                .append('(')
+                .append(decimalFormat.format(histogram.getMin() + i * histogram.getRange()))
+                .append(" ; ")
+                .append(decimalFormat.format(histogram.getMin() + (i + 1) * histogram.getRange()))
+                .append(')').toString();
     }
 
 }

@@ -14,9 +14,13 @@ public class Histogram {
     @Getter
     private int[] values;
 
+    @Getter
     private double min;
 
     private double max;
+
+    @Getter
+    private double range;
 
     public Histogram(List<Point> points, int numberOfRanges) {
         this.points = points;
@@ -43,7 +47,7 @@ public class Histogram {
     private void calculate() {
         this.setMinMax();
 
-        double range = (this.max - this.min) / this.numberOfRanges;
+        range = (this.max - this.min) / this.numberOfRanges;
 
         for (Point point : points) {
             int index = (int) Math.ceil((point.getY() - min) / range) - 1;
