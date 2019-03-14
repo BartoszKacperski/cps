@@ -31,8 +31,8 @@ public class Histogram {
     }
 
     private void setMinMax() {
-        min = 10e10;
-        max = -10e10;
+        min = Double.MAX_VALUE;
+        max = -Double.MAX_VALUE;
 
         for (Point point : points) {
             if (point.getY() > max) {
