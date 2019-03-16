@@ -94,7 +94,10 @@ public class SignalUtils {
     }
 
     public static double averageValue(Signal signal){
-        List<Point> points = adjustPointsIfTermSignal(signal);
+        return averageValue(adjustPointsIfTermSignal(signal));
+    }
+
+    public static double averageValue(List<Point> points){
         int firstValue = 0;
         int lastValue = points.size();
 
@@ -110,7 +113,10 @@ public class SignalUtils {
     }
 
     public static double absoluteAverageValue(Signal signal){
-        List<Point> points = adjustPointsIfTermSignal(signal);
+        return absoluteAverageValue(adjustPointsIfTermSignal(signal));
+    }
+
+    public static double absoluteAverageValue(List<Point> points){
         int firstValue = 0;
         int lastValue = points.size();
 
@@ -126,7 +132,10 @@ public class SignalUtils {
     }
 
     public static double power(Signal signal){
-        List<Point> points = adjustPointsIfTermSignal(signal);
+        return power(adjustPointsIfTermSignal(signal));
+    }
+
+    public static double power(List<Point> points){
         int firstValue = 0;
         int lastValue = points.size();
 
@@ -142,12 +151,15 @@ public class SignalUtils {
     }
 
     public static double variance(Signal signal){
-        List<Point> points = adjustPointsIfTermSignal(signal);
+        return variance(adjustPointsIfTermSignal(signal));
+    }
+
+    public static double variance(List<Point> points){
         int firstValue = 0;
         int lastValue = points.size();
 
         double fraction = 1.0/(lastValue - firstValue + 1.0);
-        double avg = averageValue(signal);
+        double avg = averageValue(points);
         double sum = 0.0;
 
         for(Point point : points){
@@ -158,7 +170,10 @@ public class SignalUtils {
     }
 
     public static double effectiveValue(Signal signal){
-        return Math.sqrt(power(signal));
+        return effectiveValue(signal.getPoints());
     }
 
+    public static double effectiveValue(List<Point> points){
+        return Math.sqrt(power(points));
+    }
 }

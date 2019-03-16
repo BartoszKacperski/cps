@@ -108,29 +108,30 @@ public class MainController implements Initializable {
         Signal firstSignal = firstSignals.getValue();
         Signal secondSignal = secondSignals.getValue();
 
-        fillChartWith(SignalUtils.addition(firstSignal, secondSignal), "Dodawanie");
+        fillGuiWith(SignalUtils.addition(firstSignal, secondSignal), "Dodawanie");
     }
 
     public void subtractSignals(ActionEvent actionEvent) {
         Signal firstSignal = firstSignals.getValue();
         Signal secondSignal = secondSignals.getValue();
 
-        fillChartWith(SignalUtils.subtraction(firstSignal, secondSignal), "Odejmowanie");
+        fillGuiWith(SignalUtils.subtraction(firstSignal, secondSignal), "Odejmowanie");
     }
 
     public void multiplySignals(ActionEvent actionEvent) {
         Signal firstSignal = firstSignals.getValue();
         Signal secondSignal = secondSignals.getValue();
 
-        fillChartWith(SignalUtils.multiplication(firstSignal, secondSignal), "Mnozenie");
+        fillGuiWith(SignalUtils.multiplication(firstSignal, secondSignal), "Mnozenie");
     }
 
     public void divideSignals(ActionEvent actionEvent) {
         Signal firstSignal = firstSignals.getValue();
         Signal secondSignal = secondSignals.getValue();
 
-        fillChartWith(SignalUtils.division(firstSignal, secondSignal), "Dzielenie");
+        fillGuiWith(SignalUtils.division(firstSignal, secondSignal), "Dzielenie");
     }
+
 
     public void onSignalChosen(ActionEvent actionEvent) {
         Signal pickedSignal = signalNames.get(signalChoiceBox.getValue());
@@ -267,12 +268,26 @@ public class MainController implements Initializable {
         this.openHistogram(signal.getPoints());
     }
 
+    private void fillGuiWith(List<Point> points, String name){
+        fillChartWith(points, name);
+        fillValuesWith(points);
+        this.openHistogram(points);
+    }
+
     private void fillValuesWith(Signal signal) {
-        avgValue.setText(String.format("Wartosc srednia \n %g", SignalUtils.averageValue(signal)));
-        absoluteAvgValue.setText(String.format("Bez. wart. srednia \n %g", SignalUtils.absoluteAverageValue(signal)));
-        power.setText(String.format("Moc \n %g", SignalUtils.power(signal)));
-        variance.setText(String.format("Wariacja \n %g", SignalUtils.variance(signal)));
-        effectiveValue.setText(String.format("Wartosc skuteczna \n %g", SignalUtils.effectiveValue(signal)));
+        showValues(SignalUtils.averageValue(signal), SignalUtils.absoluteAverageValue(signal), SignalUtils.power(signal), SignalUtils.variance(signal), SignalUtils.effectiveValue(signal));
+    }
+
+    private void fillValuesWith(List<Point> points){
+        showValues(SignalUtils.averageValue(points), SignalUtils.absoluteAverageValue(points), SignalUtils.power(points), SignalUtils.variance(points), SignalUtils.effectiveValue(points));
+    }
+
+    private void showValues(double avg, double v2, double power, double variance, double v3) {
+        this.avgValue.setText(String.format("Wartosc srednia \n %g", avg));
+        this.absoluteAvgValue.setText(String.format("Bez. wart. srednia \n %g", v2));
+        this.power.setText(String.format("Moc \n %g", power));
+        this.variance.setText(String.format("Wariacja \n %g", variance));
+        this.effectiveValue.setText(String.format("Wartosc skuteczna \n %g", v3));
     }
 
     private void clearChart() {
