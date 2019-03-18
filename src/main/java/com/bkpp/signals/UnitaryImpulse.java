@@ -4,7 +4,8 @@ public class UnitaryImpulse extends DiscreteSignal {
 
     @Override
     public Double getValue(Double t) {
-        if(Math.abs(t - parameter) < 1E-10){
+        double sample = (t - super.startTime) * super.frequency;
+        if(Math.abs(sample - parameter) < 1E-10){
             return 1.0;
         } else {
             return 0.0;
