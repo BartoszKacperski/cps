@@ -3,7 +3,7 @@ package com.bkpp.signals;
 public class TriangleSignal extends FillFactorTermSignal {
     @Override
     public Double getValue(Double t) {
-        super.k = (int)(t/term);
+        super.k = (int)Math.floor(((t - startTime)/term));
         Double rangeStart =  super.k * term + super.startTime;
         Double rangeEnd = super.term * (super.fillFactor + super.k) + startTime;
 
