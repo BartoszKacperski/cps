@@ -1,11 +1,20 @@
 package com.bkpp.signals;
 
-public class UnitaryImpulse extends DiscreteSignal {
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+
+public class UnitaryImpulse extends Signal {
+    private Double sampleNumber;
 
     @Override
     public Double getValue(Double t) {
         double sample = (t - super.startTime) * super.frequency;
-        if(Math.abs(sample - parameter) < 1E-10){
+        if(Math.abs(sample - sampleNumber) < 1E-10){
             return 1.0;
         } else {
             return 0.0;

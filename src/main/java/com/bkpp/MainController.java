@@ -63,9 +63,11 @@ public class MainController implements Initializable {
 
     private HashMap<String, Signal> signalNames;
     private DynamicParameters dynamicParameters;
+    private ResourceBundle resourceBundle;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        this.resourceBundle = resourceBundle;
         initializeSignalsName();
         initializeChoiceBox();
     }
@@ -125,7 +127,7 @@ public class MainController implements Initializable {
     public void onSignalChosen(ActionEvent actionEvent) {
         Signal pickedSignal = signalNames.get(signalChoiceBox.getValue());
 
-        this.dynamicParameters = new DynamicParameters(pickedSignal);
+        this.dynamicParameters = new DynamicParameters(pickedSignal, resourceBundle);
         parameters.getChildren().clear();
         parameters.getChildren().add(dynamicParameters);
     }

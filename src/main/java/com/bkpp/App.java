@@ -6,6 +6,8 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.fxml.FXMLLoader;
 
+import java.util.ResourceBundle;
+
 /**
  * Hello world!
  *
@@ -26,7 +28,7 @@ public class App extends Application
     @Override
     public void start(Stage stage) throws Exception {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/Main.fxml"));
-
+        loader.setResources(ResourceBundle.getBundle("bundles.parameters"));
         Scene scene = new Scene(loader.load());
 
         stage.setScene(scene);

@@ -1,14 +1,21 @@
 package com.bkpp.signals;
 
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+
 import java.util.concurrent.ThreadLocalRandom;
 
-public class ImpulseNoise extends DiscreteSignal {
+@AllArgsConstructor
+@NoArgsConstructor
+
+public class ImpulseNoise extends Signal {
+    private Double probability;
 
     @Override
     public Double getValue(Double t) {
         Double random = ThreadLocalRandom.current().nextDouble();
 
-        if(random <= parameter){
+        if(random <= probability){
             return amplitude;
         } else {
             return 0.0;
