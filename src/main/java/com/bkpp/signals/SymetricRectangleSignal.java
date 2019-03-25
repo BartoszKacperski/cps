@@ -1,11 +1,11 @@
 package com.bkpp.signals;
 
-public class SymetricRectangleSignal extends FillFactorTermSignal {
+public class SymetricRectangleSignal extends FillFactorPeriodSignal {
     @Override
     public Double getValue(Double t) {
-        super.k = (int)Math.floor(((t - startTime)/term));
-        Double rangeStart =  super.k * term + super.startTime;
-        Double rangeEnd = super.term * (super.fillFactor + super.k) + startTime;
+        super.k = (int)Math.floor(((t - startTime)/ period));
+        Double rangeStart =  super.k * period + super.startTime;
+        Double rangeEnd = super.period * (super.fillFactor + super.k) + startTime;
 
         if(checkIfNumberInRange(t, rangeStart, rangeEnd)){
             return super.amplitude;

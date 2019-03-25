@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 
 
-public abstract class FillFactorTermSignal extends TermSignal {
+public abstract class FillFactorPeriodSignal extends PeriodSignal {
     protected Integer k;
     protected Double fillFactor;
 

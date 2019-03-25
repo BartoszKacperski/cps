@@ -1,10 +1,9 @@
 package com.bkpp;
 
 import com.bkpp.signals.Signal;
-import com.bkpp.signals.TermSignal;
+import com.bkpp.signals.PeriodSignal;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -83,9 +82,9 @@ public class SignalUtils {
     }
 
     private static List<Point> adjustPointsIfTermSignal(Signal signal){
-        if(signal instanceof TermSignal){
-            TermSignal termSignal = (TermSignal)signal;
-            final double lastXInTerm = ((int)(termSignal.getDuration()/termSignal.getTerm()) * termSignal.getTerm());
+        if(signal instanceof PeriodSignal){
+            PeriodSignal periodSignal = (PeriodSignal)signal;
+            final double lastXInTerm = ((int)(periodSignal.getDuration()/ periodSignal.getPeriod()) * periodSignal.getPeriod());
 
             return signal.getPoints().stream().filter(point -> point.getX() <= lastXInTerm).collect(Collectors.toList());
         } else {

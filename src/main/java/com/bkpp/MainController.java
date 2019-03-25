@@ -8,6 +8,7 @@ import javafx.scene.Scene;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
+import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.apache.commons.lang3.SerializationUtils;
@@ -17,11 +18,12 @@ import java.net.URL;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
 public class MainController implements Initializable {
     @FXML
-    Label parameterLabel;
+    VBox parameters;
     @FXML
     ComboBox<Signal> signalsToSave;
     @FXML
@@ -53,20 +55,6 @@ public class MainController implements Initializable {
     @FXML
     Button clear;
     @FXML
-    TextField frequency;
-    @FXML
-    TextField parameter;
-    @FXML
-    TextField fillFactor;
-    @FXML
-    TextField amplitude;
-    @FXML
-    TextField startTime;
-    @FXML
-    TextField duration;
-    @FXML
-    TextField term;
-    @FXML
     Button generate;
     @FXML
     LineChart<Double, Double> chart;
@@ -74,6 +62,7 @@ public class MainController implements Initializable {
     ComboBox<String> signalChoiceBox;
 
     private HashMap<String, Signal> signalNames;
+    private DynamicParameters dynamicParameters;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -94,7 +83,7 @@ public class MainController implements Initializable {
         try {
             Signal pickedSignal = getInitializedPickedSignal();
             fillGuiWith(pickedSignal);
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException | IllegalAccessException e) {
             showErrorDialog("Bledne dane wejsciowe");
         }
     }
@@ -136,19 +125,10 @@ public class MainController implements Initializable {
     public void onSignalChosen(ActionEvent actionEvent) {
         Signal pickedSignal = signalNames.get(signalChoiceBox.getValue());
 
-        if (pickedSignal instanceof UnitaryJump) {
-            parameter.setPromptText("Czas skoku");
-            parameterLabel.setText("Czas skoku");
-        } else if (pickedSignal instanceof UnitaryImpulse) {
-            parameter.setPromptText("Numer probki");
-            parameterLabel.setText("Numer probki");
-        } else {
-            parameter.setPromptText("Prawdopodobienstwo");
-            parameterLabel.setText("Prawdopodobienstwo");
-        }
-
+        this.dynamicParameters = new DynamicParameters(pickedSignal);
+        parameters.getChildren().clear();
+        parameters.getChildren().add(dynamicParameters);
     }
-
 
 
     private void initializeSignalsName() {
@@ -173,28 +153,8 @@ public class MainController implements Initializable {
         }
     }
 
-    private Signal getInitializedPickedSignal() {
-        Signal pickedSignal = signalNames.get(signalChoiceBox.getValue());
-
-        if (frequency.getText() != null && !frequency.getText().isEmpty()) {
-            pickedSignal.setFrequency(getFrequency());
-        }
-
-        pickedSignal.setAmplitude(getAmplitude());
-        pickedSignal.setDuration(getDuration());
-        pickedSignal.setStartTime(getStartTime());
-
-        if (pickedSignal instanceof TermSignal) {
-            ((TermSignal) pickedSignal).setTerm(getTerm());
-        }
-
-        if (pickedSignal instanceof FillFactorTermSignal) {
-            ((FillFactorTermSignal) pickedSignal).setFillFactor(getFillFactor());
-        }
-
-        if (pickedSignal instanceof DiscreteSignal) {
-            ((DiscreteSignal) pickedSignal).setParameter(getParameter());
-        }
+    private Signal getInitializedPickedSignal() throws IllegalAccessException {
+        Signal pickedSignal = dynamicParameters.getInitializedSignal();
 
         pickedSignal.computePoints();
 
@@ -218,7 +178,7 @@ public class MainController implements Initializable {
     }
 
     private void saveSignalToFile(Signal signal) {
-        try (FileOutputStream fileOutputStream = new FileOutputStream(chooseFile().getAbsolutePath());) {
+        try (FileOutputStream fileOutputStream = new FileOutputStream(Objects.requireNonNull(chooseFile()).getAbsolutePath())) {
             SerializationUtils.serialize(signal, fileOutputStream);
         } catch (IOException e) {
             showErrorDialog("Nie udalo sie zapisac sygnalu do pliku");
@@ -226,7 +186,7 @@ public class MainController implements Initializable {
     }
 
     private void loadSignalFromFile() {
-        try (FileInputStream fileInputStream = new FileInputStream(chooseFile().getAbsolutePath())) {
+        try (FileInputStream fileInputStream = new FileInputStream(Objects.requireNonNull(chooseFile()).getAbsolutePath())) {
             Signal signal = SerializationUtils.deserialize(fileInputStream);
             fillGuiWith(signal);
         } catch (IOException e) {
@@ -234,33 +194,6 @@ public class MainController implements Initializable {
         }
     }
 
-    private Double getAmplitude() {
-        return Double.valueOf(amplitude.getText());
-    }
-
-    private Double getStartTime() {
-        return Double.valueOf(startTime.getText());
-    }
-
-    private Double getDuration() {
-        return Double.valueOf(duration.getText());
-    }
-
-    private Double getTerm() {
-        return Double.valueOf(term.getText());
-    }
-
-    private Double getFillFactor() {
-        return Double.valueOf(fillFactor.getText());
-    }
-
-    private Double getParameter() {
-        return Double.valueOf(parameter.getText());
-    }
-
-    private Double getFrequency() {
-        return Double.valueOf(frequency.getText());
-    }
 
     private void fillGuiWith(Signal signal) {
         fillChartWith(signal);
@@ -268,7 +201,7 @@ public class MainController implements Initializable {
         this.openHistogram(signal.getPoints());
     }
 
-    private void fillGuiWith(List<Point> points, String name){
+    private void fillGuiWith(List<Point> points, String name) {
         fillChartWith(points, name);
         fillValuesWith(points);
         this.openHistogram(points);
@@ -278,7 +211,7 @@ public class MainController implements Initializable {
         showValues(SignalUtils.averageValue(signal), SignalUtils.absoluteAverageValue(signal), SignalUtils.power(signal), SignalUtils.variance(signal), SignalUtils.effectiveValue(signal));
     }
 
-    private void fillValuesWith(List<Point> points){
+    private void fillValuesWith(List<Point> points) {
         showValues(SignalUtils.averageValue(points), SignalUtils.absoluteAverageValue(points), SignalUtils.power(points), SignalUtils.variance(points), SignalUtils.effectiveValue(points));
     }
 
