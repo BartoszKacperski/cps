@@ -3,13 +3,14 @@ package com.bkpp.signals;
 import com.bkpp.Point;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 @Data
-@AllArgsConstructor
+@NoArgsConstructor
 
 public abstract class Signal implements Serializable {
     protected Double frequency = 1.0;
@@ -18,11 +19,6 @@ public abstract class Signal implements Serializable {
     protected Double duration;
     private List<Point> points;
 
-    public Signal() {
-        amplitude = 0.0;
-        startTime = 0.0;
-        duration = 0.0;
-    }
 
     public void computePoints(){
         points = new ArrayList<>();

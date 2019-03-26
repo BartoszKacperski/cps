@@ -14,12 +14,11 @@ import javafx.stage.Stage;
 import org.apache.commons.lang3.SerializationUtils;
 
 import java.io.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class MainController implements Initializable {
     @FXML
@@ -73,7 +72,7 @@ public class MainController implements Initializable {
     }
 
     public void saveSignal(ActionEvent actionEvent) {
-        Signal pickedSignal = signalNames.get(signalChoiceBox.getValue());
+        Signal pickedSignal = signalsToSave.getValue();
         saveSignalToFile(pickedSignal);
     }
 
@@ -99,30 +98,37 @@ public class MainController implements Initializable {
         Signal firstSignal = firstSignals.getValue();
         Signal secondSignal = secondSignals.getValue();
 
-        fillGuiWith(SignalUtils.addition(firstSignal, secondSignal), "Dodawanie");
+        saveResultOfOperation(SignalUtils.addition(firstSignal, secondSignal), "Dodawanie");
     }
 
     public void subtractSignals(ActionEvent actionEvent) {
         Signal firstSignal = firstSignals.getValue();
         Signal secondSignal = secondSignals.getValue();
 
-        fillGuiWith(SignalUtils.subtraction(firstSignal, secondSignal), "Odejmowanie");
+        saveResultOfOperation(SignalUtils.subtraction(firstSignal, secondSignal), "Odejmowanie");
     }
 
     public void multiplySignals(ActionEvent actionEvent) {
         Signal firstSignal = firstSignals.getValue();
         Signal secondSignal = secondSignals.getValue();
 
-        fillGuiWith(SignalUtils.multiplication(firstSignal, secondSignal), "Mnozenie");
+        saveResultOfOperation(SignalUtils.multiplication(firstSignal, secondSignal), "Mnozenie");
     }
 
     public void divideSignals(ActionEvent actionEvent) {
         Signal firstSignal = firstSignals.getValue();
         Signal secondSignal = secondSignals.getValue();
 
-        fillGuiWith(SignalUtils.division(firstSignal, secondSignal), "Dzielenie");
+        saveResultOfOperation(SignalUtils.division(firstSignal, secondSignal), "Dzielenie");
     }
 
+
+    public void saveResultOfOperation(List<Point> points, String operationName) {
+        fillGuiWith(points, operationName);
+        Signal result = new ResultSignal(points);
+
+        saveSignal(result);
+    }
 
     public void onSignalChosen(ActionEvent actionEvent) {
         Signal pickedSignal = signalNames.get(signalChoiceBox.getValue());
@@ -180,16 +186,20 @@ public class MainController implements Initializable {
     }
 
     private void saveSignalToFile(Signal signal) {
-        try (FileOutputStream fileOutputStream = new FileOutputStream(Objects.requireNonNull(chooseFile()).getAbsolutePath())) {
+        File file = fileChooser().showSaveDialog(App.getPrimaryStage());
+        try (FileOutputStream fileOutputStream = new FileOutputStream(Objects.requireNonNull(file).getAbsolutePath())) {
             SerializationUtils.serialize(signal, fileOutputStream);
         } catch (IOException e) {
             showErrorDialog("Nie udalo sie zapisac sygnalu do pliku");
         }
+
     }
 
     private void loadSignalFromFile() {
-        try (FileInputStream fileInputStream = new FileInputStream(Objects.requireNonNull(chooseFile()).getAbsolutePath())) {
+        File file = fileChooser().showOpenDialog(App.getPrimaryStage());
+        try (FileInputStream fileInputStream = new FileInputStream(Objects.requireNonNull(file).getAbsolutePath())) {
             Signal signal = SerializationUtils.deserialize(fileInputStream);
+            saveSignal(signal);
             fillGuiWith(signal);
         } catch (IOException e) {
             showErrorDialog("Nie udalo się zaladowac sygnalu");
@@ -253,12 +263,13 @@ public class MainController implements Initializable {
         chart.getData().add(series);
     }
 
-    private File chooseFile() {
+    private FileChooser fileChooser() {
         FileChooser chooser = new FileChooser();
         chooser.setTitle("Wybierz plik");
         File defaultDirectory = new File(Paths.get(".").toAbsolutePath().normalize().toString());
         chooser.setInitialDirectory(defaultDirectory);
-        return chooser.showOpenDialog(App.getPrimaryStage());
+
+        return chooser;
     }
 
     private void showErrorDialog(String message) {
