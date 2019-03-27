@@ -123,9 +123,8 @@ public class MainController implements Initializable {
     }
 
 
-    public void saveResultOfOperation(List<Point> points, String operationName) {
-        fillGuiWith(points, operationName);
-        Signal result = new ResultSignal(points);
+    public void saveResultOfOperation(Signal result, String operationName) {
+        fillGuiWith(result);
 
         saveSignal(result);
     }
@@ -213,18 +212,13 @@ public class MainController implements Initializable {
         this.openHistogram(signal.getPoints());
     }
 
-    private void fillGuiWith(List<Point> points, String name) {
-        fillChartWith(points, name);
-        fillValuesWith(points);
-        this.openHistogram(points);
-    }
 
     private void fillValuesWith(Signal signal) {
-        showValues(SignalUtils.averageValue(signal), SignalUtils.absoluteAverageValue(signal), SignalUtils.power(signal), SignalUtils.variance(signal), SignalUtils.effectiveValue(signal));
-    }
-
-    private void fillValuesWith(List<Point> points) {
-        showValues(SignalUtils.averageValue(points), SignalUtils.absoluteAverageValue(points), SignalUtils.power(points), SignalUtils.variance(points), SignalUtils.effectiveValue(points));
+        showValues(SignalUtils.averageValue(signal),
+                SignalUtils.absoluteAverageValue(signal),
+                SignalUtils.power(signal),
+                SignalUtils.variance(signal),
+                SignalUtils.effectiveValue(signal));
     }
 
     private void showValues(double avg, double v2, double power, double variance, double v3) {
@@ -242,7 +236,7 @@ public class MainController implements Initializable {
     private void fillChartWith(Signal signal) {
         XYChart.Series<Double, Double> series = new XYChart.Series<>();
 
-        series.setName(signal.toString() + " #" + chart.getData().size());
+        series.setName(signal.toString());
 
         for (Point point : signal.getPoints()) {
             series.getData().add(new XYChart.Data<>(point.getX(), point.getY()));
@@ -251,17 +245,6 @@ public class MainController implements Initializable {
         chart.getData().add(series);
     }
 
-    private void fillChartWith(List<Point> points, String name) {
-        XYChart.Series<Double, Double> series = new XYChart.Series<>();
-
-        series.setName(name);
-
-        for (Point point : points) {
-            series.getData().add(new XYChart.Data<>(point.getX(), point.getY()));
-        }
-
-        chart.getData().add(series);
-    }
 
     private FileChooser fileChooser() {
         FileChooser chooser = new FileChooser();

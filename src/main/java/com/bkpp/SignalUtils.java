@@ -1,5 +1,6 @@
 package com.bkpp;
 
+import com.bkpp.signals.ResultSignal;
 import com.bkpp.signals.Signal;
 import com.bkpp.signals.PeriodSignal;
 
@@ -13,7 +14,7 @@ public class SignalUtils {
 
     }
 
-    public static List<Point> addition(Signal firstSignal, Signal secondSignal){
+    public static Signal addition(Signal firstSignal, Signal secondSignal){
         List<Point> firstPoints = firstSignal.getPoints();
         List<Point> secondPoints = secondSignal.getPoints();
         List<Point> sum = new ArrayList<>();
@@ -27,10 +28,13 @@ public class SignalUtils {
             }
         }
 
-        return sum;
+        Signal sumSignal = new ResultSignal(sum, ResultSignal.Operation.addition);
+        sumSignal.setAmplitude(firstSignal.getAmplitude() + secondSignal.getAmplitude());
+
+        return sumSignal;
     }
 
-    public static List<Point> subtraction(Signal firstSignal, Signal secondSignal){
+    public static Signal subtraction(Signal firstSignal, Signal secondSignal){
         List<Point> firstPoints = firstSignal.getPoints();
         List<Point> secondPoints = secondSignal.getPoints();
         List<Point> difference = new ArrayList<>();
@@ -44,10 +48,13 @@ public class SignalUtils {
             }
         }
 
-        return difference;
+        Signal differenceSignal = new ResultSignal(difference, ResultSignal.Operation.subtraction);
+        differenceSignal.setAmplitude(firstSignal.getAmplitude() - secondSignal.getAmplitude());
+
+        return differenceSignal;
     }
 
-    public static List<Point> multiplication(Signal firstSignal, Signal secondSignal){
+    public static Signal multiplication(Signal firstSignal, Signal secondSignal){
         List<Point> firstPoints = firstSignal.getPoints();
         List<Point> secondPoints = secondSignal.getPoints();
         List<Point> product = new ArrayList<>();
@@ -61,10 +68,13 @@ public class SignalUtils {
             }
         }
 
-        return product;
+        Signal productSignal = new ResultSignal(product, ResultSignal.Operation.multiplication);
+        productSignal.setAmplitude(firstSignal.getAmplitude() - secondSignal.getAmplitude());
+
+        return productSignal;
     }
 
-    public static List<Point> division(Signal firstSignal, Signal secondSignal){
+    public static Signal division(Signal firstSignal, Signal secondSignal){
         List<Point> firstPoints = firstSignal.getPoints();
         List<Point> secondPoints = secondSignal.getPoints();
         List<Point> quotient = new ArrayList<>();
@@ -78,7 +88,10 @@ public class SignalUtils {
             }
         }
 
-        return quotient;
+        Signal quotientSignal = new ResultSignal(quotient, ResultSignal.Operation.division);
+        quotientSignal.setAmplitude(firstSignal.getAmplitude() - secondSignal.getAmplitude());
+
+        return quotientSignal;
     }
 
     private static List<Point> adjustPointsIfTermSignal(Signal signal){
