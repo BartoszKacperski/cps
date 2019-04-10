@@ -1,12 +1,12 @@
 package com.bkpp;
 
 import com.bkpp.histogram.Histogram;
+import com.bkpp.signals.Point;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
-import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;

@@ -1,5 +1,6 @@
-package com.bkpp;
+package com.bkpp.signals;
 
+import com.bkpp.signals.Point;
 import com.bkpp.signals.ResultSignal;
 import com.bkpp.signals.Signal;
 import com.bkpp.signals.PeriodSignal;
@@ -30,6 +31,9 @@ public class SignalUtils {
 
         Signal sumSignal = new ResultSignal(sum, ResultSignal.Operation.addition);
         sumSignal.setAmplitude(firstSignal.getAmplitude() + secondSignal.getAmplitude());
+        sumSignal.setDuration(firstSignal.getDuration());
+        sumSignal.setFrequency(firstSignal.getFrequency());
+        sumSignal.setStartTime(firstSignal.getStartTime());
 
         return sumSignal;
     }
@@ -50,6 +54,9 @@ public class SignalUtils {
 
         Signal differenceSignal = new ResultSignal(difference, ResultSignal.Operation.subtraction);
         differenceSignal.setAmplitude(firstSignal.getAmplitude() - secondSignal.getAmplitude());
+        differenceSignal.setDuration(firstSignal.getDuration());
+        differenceSignal.setFrequency(firstSignal.getFrequency());
+        differenceSignal.setStartTime(firstSignal.getStartTime());
 
         return differenceSignal;
     }
@@ -70,6 +77,9 @@ public class SignalUtils {
 
         Signal productSignal = new ResultSignal(product, ResultSignal.Operation.multiplication);
         productSignal.setAmplitude(firstSignal.getAmplitude() - secondSignal.getAmplitude());
+        productSignal.setDuration(firstSignal.getDuration());
+        productSignal.setFrequency(firstSignal.getFrequency());
+        productSignal.setStartTime(firstSignal.getStartTime());
 
         return productSignal;
     }
@@ -90,6 +100,9 @@ public class SignalUtils {
 
         Signal quotientSignal = new ResultSignal(quotient, ResultSignal.Operation.division);
         quotientSignal.setAmplitude(firstSignal.getAmplitude() - secondSignal.getAmplitude());
+        quotientSignal.setDuration(firstSignal.getDuration());
+        quotientSignal.setFrequency(firstSignal.getFrequency());
+        quotientSignal.setStartTime(firstSignal.getStartTime());
 
         return quotientSignal;
     }

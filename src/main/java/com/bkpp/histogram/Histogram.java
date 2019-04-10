@@ -1,6 +1,6 @@
 package com.bkpp.histogram;
 
-import com.bkpp.Point;
+import com.bkpp.signals.Point;
 import lombok.Getter;
 
 import java.util.List;

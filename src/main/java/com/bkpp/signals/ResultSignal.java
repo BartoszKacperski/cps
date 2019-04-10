@@ -1,6 +1,5 @@
 package com.bkpp.signals;
 
-import com.bkpp.Point;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

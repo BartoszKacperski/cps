@@ -1,6 +1,11 @@
 package com.bkpp;
 
+import com.bkpp.converters.Converter;
 import com.bkpp.signals.*;
+import javafx.beans.property.ListProperty;
+import javafx.beans.property.SimpleListProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -14,8 +19,6 @@ import javafx.stage.Stage;
 import org.apache.commons.lang3.SerializationUtils;
 
 import java.io.*;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.*;
@@ -24,11 +27,15 @@ public class MainController implements Initializable {
     @FXML
     VBox parameters;
     @FXML
+    ComboBox<String> signalChoiceBox;
+    @FXML
     ComboBox<Signal> signalsToSave;
     @FXML
-    Button saveSignal;
+    ComboBox<Signal> firstSignals;
     @FXML
-    Button loadSignal;
+    ComboBox<Signal> secondSignals;
+    @FXML
+    ComboBox<Signal> signalsToQuantization;
     @FXML
     Label avgValue;
     @FXML
@@ -40,103 +47,28 @@ public class MainController implements Initializable {
     @FXML
     Label effectiveValue;
     @FXML
-    Button multiply;
-    @FXML
-    Button divide;
-    @FXML
-    Button subtract;
-    @FXML
-    Button add;
-    @FXML
-    ComboBox<Signal> firstSignals;
-    @FXML
-    ComboBox<Signal> secondSignals;
-    @FXML
-    Button clear;
-    @FXML
-    Button generate;
+    Label meanSquaredError;
     @FXML
     LineChart<Double, Double> chart;
     @FXML
-    ComboBox<String> signalChoiceBox;
+    TextField quantizationBytes;
+    @FXML
+    TextField quantizationSampling;
 
     private HashMap<String, Signal> signalNames;
     private DynamicParameters dynamicParameters;
     private ResourceBundle resourceBundle;
+    private ObservableList<Signal> generatedSignals;
+    private Converter converter;
 
+    //region initializations
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         this.resourceBundle = resourceBundle;
         initializeSignalsName();
-        initializeChoiceBox();
+        initializeSignalChoiceBox();
+        initializeComboBoxBindings();
     }
-
-    public void saveSignal(ActionEvent actionEvent) {
-        Signal pickedSignal = signalsToSave.getValue();
-        saveSignalToFile(pickedSignal);
-    }
-
-    public void loadSignal(ActionEvent actionEvent) {
-        loadSignalFromFile();
-    }
-
-    public void generateSignal(ActionEvent actionEvent) {
-        try {
-            Signal pickedSignal = getInitializedPickedSignal();
-            fillGuiWith(pickedSignal);
-        } catch (NumberFormatException | IllegalAccessException e) {
-            showErrorDialog("Bledne dane wejsciowe");
-        }
-    }
-
-    public void clearChart(ActionEvent actionEvent) {
-        clearChart();
-        clearGeneratedSignals();
-    }
-
-    public void addSignals(ActionEvent actionEvent) {
-        Signal firstSignal = firstSignals.getValue();
-        Signal secondSignal = secondSignals.getValue();
-
-        saveResultOfOperation(SignalUtils.addition(firstSignal, secondSignal), "Dodawanie");
-    }
-
-    public void subtractSignals(ActionEvent actionEvent) {
-        Signal firstSignal = firstSignals.getValue();
-        Signal secondSignal = secondSignals.getValue();
-
-        saveResultOfOperation(SignalUtils.subtraction(firstSignal, secondSignal), "Odejmowanie");
-    }
-
-    public void multiplySignals(ActionEvent actionEvent) {
-        Signal firstSignal = firstSignals.getValue();
-        Signal secondSignal = secondSignals.getValue();
-
-        saveResultOfOperation(SignalUtils.multiplication(firstSignal, secondSignal), "Mnozenie");
-    }
-
-    public void divideSignals(ActionEvent actionEvent) {
-        Signal firstSignal = firstSignals.getValue();
-        Signal secondSignal = secondSignals.getValue();
-
-        saveResultOfOperation(SignalUtils.division(firstSignal, secondSignal), "Dzielenie");
-    }
-
-
-    public void saveResultOfOperation(Signal result, String operationName) {
-        fillGuiWith(result);
-
-        saveSignal(result);
-    }
-
-    public void onSignalChosen(ActionEvent actionEvent) {
-        Signal pickedSignal = signalNames.get(signalChoiceBox.getValue());
-
-        this.dynamicParameters = new DynamicParameters(pickedSignal, resourceBundle);
-        parameters.getChildren().clear();
-        parameters.getChildren().add(dynamicParameters);
-    }
-
 
     private void initializeSignalsName() {
         signalNames = new HashMap<>();
@@ -154,36 +86,135 @@ public class MainController implements Initializable {
         signalNames.put("Szum impulsowy", new ImpulseNoise());
     }
 
-    private void initializeChoiceBox() {
+    private void initializeSignalChoiceBox() {
         for (String name : signalNames.keySet()) {
             signalChoiceBox.getItems().add(name);
         }
     }
 
+    private void initializeComboBoxBindings() {
+        generatedSignals = FXCollections.observableArrayList();
+        ListProperty<Signal> listProperty = new SimpleListProperty<>();
+        listProperty.set(generatedSignals);
+
+        signalsToSave.itemsProperty().bind(listProperty);
+        firstSignals.itemsProperty().bind(listProperty);
+        secondSignals.itemsProperty().bind(listProperty);
+        signalsToQuantization.itemsProperty().bind(listProperty);
+    }
+    //endregion
+
+    //region onActions
+    public void saveSignal(ActionEvent actionEvent) {
+        Signal pickedSignal = signalsToSave.getValue();
+
+        saveSignalToFile(pickedSignal);
+    }
+
+    public void loadSignal(ActionEvent actionEvent) {
+        loadSignalFromFile();
+    }
+
+    public void generateSignal(ActionEvent actionEvent) {
+        try {
+            Signal pickedSignal = getInitializedPickedSignal();
+            saveSignal(pickedSignal);
+            fillGuiWith(pickedSignal);
+        } catch (NumberFormatException | IllegalAccessException e) {
+            showErrorDialog("Bledne dane wejsciowe");
+        }
+    }
+
+    public void clearChart(ActionEvent actionEvent) {
+        clearChart();
+        clearGeneratedSignals();
+    }
+
+    public void addSignals(ActionEvent actionEvent) {
+        Signal firstSignal = firstSignals.getValue();
+        Signal secondSignal = secondSignals.getValue();
+
+        saveResultOfOperation(SignalUtils.addition(firstSignal, secondSignal));
+    }
+
+    public void subtractSignals(ActionEvent actionEvent) {
+        Signal firstSignal = firstSignals.getValue();
+        Signal secondSignal = secondSignals.getValue();
+
+        saveResultOfOperation(SignalUtils.subtraction(firstSignal, secondSignal));
+    }
+
+    public void multiplySignals(ActionEvent actionEvent) {
+        Signal firstSignal = firstSignals.getValue();
+        Signal secondSignal = secondSignals.getValue();
+
+        saveResultOfOperation(SignalUtils.multiplication(firstSignal, secondSignal));
+    }
+
+    public void divideSignals(ActionEvent actionEvent) {
+        Signal firstSignal = firstSignals.getValue();
+        Signal secondSignal = secondSignals.getValue();
+
+        saveResultOfOperation(SignalUtils.division(firstSignal, secondSignal));
+    }
+
+    public void onSignalChosen(ActionEvent actionEvent) {
+        Signal pickedSignal = signalNames.get(signalChoiceBox.getValue());
+
+        this.dynamicParameters = new DynamicParameters(pickedSignal, resourceBundle);
+        parameters.getChildren().clear();
+        parameters.getChildren().add(dynamicParameters);
+    }
+
+    public void quantization(ActionEvent actionEvent) {
+        Signal signal = signalsToQuantization.getValue();
+        int bytes = getQuantizationBytes();
+        int sampling = getQuantizationSampling();
+
+        converter = new Converter(signal, bytes);
+
+        fillChartWith(makeSteppedPoints(converter.quantization(sampling)), "kwantyzacja");
+    }
+
+    public void reconstruction(ActionEvent actionEvent) {
+        fillChartWith(converter.reconstruction(), "rekonstrukcja");
+        showMeanSquaredError(converter.meanSquaredError());
+    }
+    //endregion
+
+    //region signalGUI
     private Signal getInitializedPickedSignal() throws IllegalAccessException {
         Signal pickedSignal = dynamicParameters.getInitializedSignal();
-
         pickedSignal.computePoints();
-
-        saveSignal(pickedSignal);
 
         return pickedSignal;
     }
 
+    private void fillGuiWith(Signal signal) {
+        fillChartWith(signal);
+        fillValuesWith(signal);
+        this.openHistogram(signal.getPoints());
+    }
+    //endregion
+
+    //region generatedSignals
     private void saveSignal(Signal signal) {
         Signal signalCopy = SerializationUtils.clone(signal);
 
-        firstSignals.getItems().add(signalCopy);
-        secondSignals.getItems().add(signalCopy);
-        signalsToSave.getItems().add(signalCopy);
+        generatedSignals.add(signalCopy);
+    }
+
+    private void saveResultOfOperation(Signal result) {
+        saveSignal(result);
+        fillGuiWith(result);
     }
 
     private void clearGeneratedSignals() {
-        firstSignals.getItems().clear();
-        secondSignals.getItems().clear();
-        signalsToSave.getItems().clear();
+        generatedSignals.clear();
     }
+    //endregion
 
+    //region signalsFileOperations
     private void saveSignalToFile(Signal signal) {
         File file = fileChooser().showSaveDialog(App.getPrimaryStage());
         try (FileOutputStream fileOutputStream = new FileOutputStream(Objects.requireNonNull(file).getAbsolutePath())) {
@@ -205,14 +236,17 @@ public class MainController implements Initializable {
         }
     }
 
+    private FileChooser fileChooser() {
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Wybierz plik");
+        File defaultDirectory = new File(Paths.get(".").toAbsolutePath().normalize().toString());
+        chooser.setInitialDirectory(defaultDirectory);
 
-    private void fillGuiWith(Signal signal) {
-        fillChartWith(signal);
-        fillValuesWith(signal);
-        this.openHistogram(signal.getPoints());
+        return chooser;
     }
+    //endregion
 
-
+    //region signalValues
     private void fillValuesWith(Signal signal) {
         showValues(SignalUtils.averageValue(signal),
                 SignalUtils.absoluteAverageValue(signal),
@@ -228,33 +262,31 @@ public class MainController implements Initializable {
         this.variance.setText(String.format("Wariacja \n %g", variance));
         this.effectiveValue.setText(String.format("Wartosc skuteczna \n %g", v3));
     }
+    //endregion
 
+    //region chart
     private void clearChart() {
         chart.getData().clear();
     }
 
     private void fillChartWith(Signal signal) {
+        fillChartWith(signal.getPoints(), signal.toString());
+    }
+
+    private void fillChartWith(List<Point> points, String seriesName) {
         XYChart.Series<Double, Double> series = new XYChart.Series<>();
 
-        series.setName(signal.toString());
+        series.setName(seriesName);
 
-        for (Point point : signal.getPoints()) {
+        for (Point point : points) {
             series.getData().add(new XYChart.Data<>(point.getX(), point.getY()));
         }
 
         chart.getData().add(series);
     }
+    //endregion
 
-
-    private FileChooser fileChooser() {
-        FileChooser chooser = new FileChooser();
-        chooser.setTitle("Wybierz plik");
-        File defaultDirectory = new File(Paths.get(".").toAbsolutePath().normalize().toString());
-        chooser.setInitialDirectory(defaultDirectory);
-
-        return chooser;
-    }
-
+    //region alerts
     private void showErrorDialog(String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Error");
@@ -263,7 +295,9 @@ public class MainController implements Initializable {
 
         alert.showAndWait();
     }
+    //endregion
 
+    //region histogram
     private void openHistogram(List<Point> points) {
         Stage stage = new Stage();
 
@@ -274,4 +308,41 @@ public class MainController implements Initializable {
         stage.setTitle("CPS Pawel Pomaranski & Bartosz Kacperski");
         stage.show();
     }
+
+    //endregion
+
+    //region quantization
+    private int getQuantizationBytes() {
+        return Integer.valueOf(quantizationBytes.getText());
+    }
+
+    private int getQuantizationSampling() {
+        return Integer.valueOf(quantizationSampling.getText());
+    }
+
+    private void showMeanSquaredError(double meanSquaredErrorValue){
+        meanSquaredError.setText("Blad sr. kwadratowy " + meanSquaredErrorValue);
+    }
+
+    private List<Point> makeSteppedPoints(List<Point> points){
+        List<Point> steppedPoints = new ArrayList<>();
+
+        for(int i = 0; i < points.size() - 1; i++){
+            Point currentPoint = points.get(i);
+            Point nextPoint = points.get(i +1);
+
+            steppedPoints.add(currentPoint);
+
+            double halfX = Math.abs(nextPoint.getX() + currentPoint.getX())/2.0;
+
+            steppedPoints.add(new Point(halfX, currentPoint.getY()));
+            steppedPoints.add(new Point(halfX, nextPoint.getY()));
+
+            steppedPoints.add(nextPoint);
+        }
+
+        return steppedPoints;
+    }
+
+    //endregion
 }

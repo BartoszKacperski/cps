@@ -1,4 +1,4 @@
-package com.bkpp;
+package com.bkpp.signals;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
