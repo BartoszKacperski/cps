@@ -6,6 +6,7 @@ import com.bkpp.signals.SignalUtils;
 import lombok.Data;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -59,33 +60,54 @@ public class Converter {
         return reconstructedPoints;
     }
 
-    public double meanSquaredError(){
+    private double reconstructedValue(double t, double Ts){
         double sum = 0.0;
-        int numberOfSimilarX = 0;
+        for(int i = 0; i < quantizedPoints.size(); i++){
+            sum += quantizedPoints.get(i).getY() * sinc(t/Ts - i);
+        }
+
+        return sum;
+    }
+
+    private double sinc(double t){
+        if(Math.abs(t - 0.0) < 1E-10){
+            return 1.0;
+        }
+
+        return Math.sin(Math.PI * t)/(Math.PI * t);
+    }
+
+    private double squaredSum(){
+        double sum = 0.0;
 
         for(int i = 0; i < reconstructedPoints.size() && i < signal.getPoints().size(); i++){
             Point reconstructedPoint = reconstructedPoints.get(i);
             Point signalPoint = signal.getPoints().get(i);
 
-            if(Math.abs(reconstructedPoint.getX() - signalPoint.getX()) < 1E-10){
-                sum += Math.pow(reconstructedPoint.getY() - signalPoint.getY(), 2.0);
-                numberOfSimilarX++;
-            }
+            sum += Math.pow(reconstructedPoint.getY() - signalPoint.getY(), 2.0);
         }
 
-        return sum/numberOfSimilarX;
+        return sum;
+    }
+
+    public double meanSquaredError(){
+        return squaredSum()/reconstructedPoints.size();
     }
 
     public double signalNoiseRatio(){
-        double signalPower = SignalUtils.power(signal);
-        double noisePower = SignalUtils.power(reconstructedPoints);
+        double signalSum = 0.0;
 
-        return signalPower/noisePower;
+        for(Point point : signal.getPoints()){
+            signalSum += Math.pow(point.getY(), 2.0);
+        }
+
+        return 10.0 * Math.log10(signalSum/squaredSum());
     }
 
     public double peakSignalNoiseRatio(){
-        //TODO nie wiem jaki jest wzór :(
-        return 0.0;
+        double max = signal.getPoints().stream().max(Comparator.comparingDouble(Point::getY)).get().getY();
+
+        return 10.0 * Math.log10(max/meanSquaredError());
     }
 
     public double maximalDifference(){
@@ -104,23 +126,6 @@ public class Converter {
         }
 
         return maxDifference;
-    }
-
-    private double reconstructedValue(double t, double Ts){
-        double sum = 0.0;
-        for(int i = 0; i < quantizedPoints.size(); i++){
-            sum += quantizedPoints.get(i).getY() * sinc(t/Ts - i);
-        }
-
-        return sum;
-    }
-
-    private double sinc(double t){
-        if(Math.abs(t - 0.0) < 1E-10){
-            return 1.0;
-        }
-
-        return Math.sin(Math.PI * t)/(Math.PI * t);
     }
 
 }
