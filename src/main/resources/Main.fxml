@@ -10,6 +10,7 @@
 <?import javafx.scene.layout.VBox?>
 
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.CheckBox?>
 <HBox prefHeight="800.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.bkpp.MainController">
     <VBox prefHeight="800.0" prefWidth="159.0">
@@ -64,8 +65,9 @@
                 <ComboBox fx:id="signalsToQuantization" prefHeight="25.0" prefWidth="228.0"/>
                 <Label prefWidth="160" text="Bity"/>
                 <TextField fx:id="quantizationBytes" prefWidth="160.0" promptText="Bity"/>
-                <Label prefWidth="160" text="Probkowanie(Co ktory pkt)" wrapText="true"/>
-                <TextField fx:id="quantizationSampling" prefWidth="160.0" promptText="Probkowanie"/>
+                <Label prefWidth="160" text="Czestotliwosc probkowania" wrapText="true"/>
+                <TextField fx:id="quantizationFrequency" prefWidth="160.0" promptText="Czestotliwosc"/>
+                <CheckBox fx:id="stepChart" prefWidth="160" text="Wykres schodkowy"/>
                 <Button mnemonicParsing="false" onAction="#quantization"
                         prefHeight="25.0" prefWidth="150.0" text="Kwantyzuj"/>
                 <Button mnemonicParsing="false" onAction="#reconstruction"

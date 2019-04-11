@@ -30,9 +30,12 @@ public class Converter {
                 .collect(Collectors.toList());
     }
 
-    public List<Point> quantization(int sampling){
+    public List<Point> quantization(double frequency){
+        int sampling = Math.toIntExact(Math.round(signal.getFrequency() / frequency));
+
         quantizedPoints = new ArrayList<>(samplePoints(signal.getPoints(), sampling));
-        final double q = Math.pow(2.0, 1.0 - bytes);
+
+        final double q = Math.pow(2.0, -(bytes - 1.0));
 
         quantizedPoints.forEach(p -> {
             double y = Math.floor((p.getY()/q) + 0.5) * q;
@@ -48,14 +51,13 @@ public class Converter {
         }
 
         reconstructedPoints = new ArrayList<>();
-        double Ts = quantizedPoints.get(1).getX() - quantizedPoints.get(0).getY();
+        double Ts = quantizedPoints.get(1).getX() - quantizedPoints.get(0).getX();
 
         for(Point point : signal.getPoints()){
             double x = point.getX();
             double value = reconstructedValue(x, Ts);
             reconstructedPoints.add(new Point(x, value));
         }
-
 
         return reconstructedPoints;
     }

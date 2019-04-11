@@ -47,6 +47,8 @@ public class MainController implements Initializable {
     @FXML
     Label effectiveValue;
     @FXML
+    CheckBox stepChart;
+    @FXML
     Label meanSquaredError;
     @FXML
     Label signalNoiseRatio;
@@ -59,7 +61,7 @@ public class MainController implements Initializable {
     @FXML
     TextField quantizationBytes;
     @FXML
-    TextField quantizationSampling;
+    TextField quantizationFrequency;
 
     private HashMap<String, Signal> signalNames;
     private DynamicParameters dynamicParameters;
@@ -196,11 +198,17 @@ public class MainController implements Initializable {
     public void quantization(ActionEvent actionEvent) {
         Signal signal = signalsToQuantization.getValue();
         int bytes = getQuantizationBytes();
-        int sampling = getQuantizationSampling();
+        double frequency = getQuantizationFrequency();
 
         converter = new Converter(signal, bytes);
 
-        fillChartWith(makeSteppedPoints(converter.quantization(sampling)), "kwantyzacja");
+        List<Point> quantizedPoints = converter.quantization(frequency);
+        if(stepChart.isSelected()){
+            fillChartWith(makeSteppedPoints(quantizedPoints), "kwantyzacja");
+        } else {
+            fillChartWithoutLines(quantizedPoints, "kwantyzacja");
+        }
+
     }
 
     public void reconstruction(ActionEvent actionEvent) {
@@ -321,6 +329,12 @@ public class MainController implements Initializable {
 
         chart.getData().add(series);
     }
+
+    private void fillChartWithoutLines(List<Point> points, String seriesName) {
+        fillChartWith(points, seriesName);
+        chart.getData().get(chart.getData().size() - 1).getNode().setStyle("-fx-stroke: transparent");
+
+    }
     //endregion
 
     //region alerts
@@ -353,8 +367,8 @@ public class MainController implements Initializable {
         return Integer.valueOf(quantizationBytes.getText());
     }
 
-    private int getQuantizationSampling() {
-        return Integer.valueOf(quantizationSampling.getText());
+    private int getQuantizationFrequency() {
+        return Integer.valueOf(quantizationFrequency.getText());
     }
 
     private void showMeanSquaredError(double meanSquaredErrorValue,
