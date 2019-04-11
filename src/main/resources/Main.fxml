@@ -70,7 +70,14 @@
                         prefHeight="25.0" prefWidth="150.0" text="Kwantyzuj"/>
                 <Button mnemonicParsing="false" onAction="#reconstruction"
                         prefHeight="25.0" prefWidth="150.0" text="Rekonstruuj"/>
-                <Label fx:id="meanSquaredError" prefWidth="150.0" text="Blad sr. kwadratowy " wrapText="true"/>
+                <TitledPane prefWidth="160" text="Bledy" expanded="false">
+                    <VBox prefWidth="140">
+                        <Label fx:id="meanSquaredError" prefWidth="150.0" text="MSE: " wrapText="true"/>
+                        <Label fx:id="signalNoiseRatio" prefWidth="150.0" text="SNR: " wrapText="true"/>
+                        <Label fx:id="peakSignalNoiseRation" prefWidth="150.0" text="PSNR: " wrapText="true"/>
+                        <Label fx:id="maximalDifference" prefWidth="150.0" text="MD: " wrapText="true"/>
+                    </VBox>
+                </TitledPane>
             </VBox>
         </TitledPane>
         <Button mnemonicParsing="false" onAction="#clearChart" prefHeight="25.0"

@@ -2,6 +2,7 @@ package com.bkpp.converters;
 
 import com.bkpp.signals.Point;
 import com.bkpp.signals.Signal;
+import com.bkpp.signals.SignalUtils;
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -42,7 +43,7 @@ public class Converter {
 
     public List<Point> reconstruction(){
         if(quantizedPoints == null){
-            quantization(2);
+            throw new IllegalStateException();
         }
 
         reconstructedPoints = new ArrayList<>();
@@ -60,14 +61,49 @@ public class Converter {
 
     public double meanSquaredError(){
         double sum = 0.0;
+        int numberOfSimilarX = 0;
+
         for(int i = 0; i < reconstructedPoints.size() && i < signal.getPoints().size(); i++){
             Point reconstructedPoint = reconstructedPoints.get(i);
             Point signalPoint = signal.getPoints().get(i);
 
-            sum += Math.pow(reconstructedPoint.getY() - signalPoint.getY(), 2.0);
+            if(Math.abs(reconstructedPoint.getX() - signalPoint.getX()) < 1E-10){
+                sum += Math.pow(reconstructedPoint.getY() - signalPoint.getY(), 2.0);
+                numberOfSimilarX++;
+            }
         }
 
-        return sum/reconstructedPoints.size();
+        return sum/numberOfSimilarX;
+    }
+
+    public double signalNoiseRatio(){
+        double signalPower = SignalUtils.power(signal);
+        double noisePower = SignalUtils.power(reconstructedPoints);
+
+        return signalPower/noisePower;
+    }
+
+    public double peakSignalNoiseRatio(){
+        //TODO nie wiem jaki jest wzór :(
+        return 0.0;
+    }
+
+    public double maximalDifference(){
+        double maxDifference = 0.0;
+
+        for(int i = 0; i < reconstructedPoints.size() && i < signal.getPoints().size(); i++){
+            Point reconstructedPoint = reconstructedPoints.get(i);
+            Point signalPoint = signal.getPoints().get(i);
+
+            if(Math.abs(reconstructedPoint.getX() - signalPoint.getX()) < 1E-10){
+                double difference =  Math.abs(reconstructedPoint.getY() - signalPoint.getY());
+                if(maxDifference < difference){
+                    maxDifference = difference;
+                }
+            }
+        }
+
+        return maxDifference;
     }
 
     private double reconstructedValue(double t, double Ts){

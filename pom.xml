@@ -9,8 +9,6 @@
   <version>1.0</version>
 
   <name>CPS</name>
-  <!-- FIXME change it to the project's website -->
-  <url>http://www.example.com</url>
 
   <dependencies>
     <dependency>

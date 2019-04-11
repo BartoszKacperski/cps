@@ -49,6 +49,12 @@ public class MainController implements Initializable {
     @FXML
     Label meanSquaredError;
     @FXML
+    Label signalNoiseRatio;
+    @FXML
+    Label peakSignalNoiseRation;
+    @FXML
+    Label maximalDifference;
+    @FXML
     LineChart<Double, Double> chart;
     @FXML
     TextField quantizationBytes;
@@ -108,7 +114,12 @@ public class MainController implements Initializable {
     public void saveSignal(ActionEvent actionEvent) {
         Signal pickedSignal = signalsToSave.getValue();
 
-        saveSignalToFile(pickedSignal);
+        if (pickedSignal != null) {
+            saveSignalToFile(pickedSignal);
+        } else {
+            showErrorDialog("Wybierz sygnal do zapisania");
+        }
+
     }
 
     public void loadSignal(ActionEvent actionEvent) {
@@ -134,28 +145,44 @@ public class MainController implements Initializable {
         Signal firstSignal = firstSignals.getValue();
         Signal secondSignal = secondSignals.getValue();
 
-        saveResultOfOperation(SignalUtils.addition(firstSignal, secondSignal));
+        if (firstSignal != null && secondSignal != null) {
+            saveResultOfOperation(SignalUtils.addition(firstSignal, secondSignal));
+        } else {
+            showErrorDialog("Nalezy wybrac dwa sygnaly aby wykonac operacje");
+        }
     }
 
     public void subtractSignals(ActionEvent actionEvent) {
         Signal firstSignal = firstSignals.getValue();
         Signal secondSignal = secondSignals.getValue();
 
-        saveResultOfOperation(SignalUtils.subtraction(firstSignal, secondSignal));
+        if (firstSignal != null && secondSignal != null) {
+            saveResultOfOperation(SignalUtils.subtraction(firstSignal, secondSignal));
+        } else {
+            showErrorDialog("Nalezy wybrac dwa sygnaly aby wykonac operacje");
+        }
     }
 
     public void multiplySignals(ActionEvent actionEvent) {
         Signal firstSignal = firstSignals.getValue();
         Signal secondSignal = secondSignals.getValue();
 
-        saveResultOfOperation(SignalUtils.multiplication(firstSignal, secondSignal));
+        if (firstSignal != null && secondSignal != null) {
+            saveResultOfOperation(SignalUtils.multiplication(firstSignal, secondSignal));
+        } else {
+            showErrorDialog("Nalezy wybrac dwa sygnaly aby wykonac operacje");
+        }
     }
 
     public void divideSignals(ActionEvent actionEvent) {
         Signal firstSignal = firstSignals.getValue();
         Signal secondSignal = secondSignals.getValue();
 
-        saveResultOfOperation(SignalUtils.division(firstSignal, secondSignal));
+        if (firstSignal != null && secondSignal != null) {
+            saveResultOfOperation(SignalUtils.division(firstSignal, secondSignal));
+        } else {
+            showErrorDialog("Nalezy wybrac dwa sygnaly aby wykonac operacje");
+        }
     }
 
     public void onSignalChosen(ActionEvent actionEvent) {
@@ -177,8 +204,15 @@ public class MainController implements Initializable {
     }
 
     public void reconstruction(ActionEvent actionEvent) {
-        fillChartWith(converter.reconstruction(), "rekonstrukcja");
-        showMeanSquaredError(converter.meanSquaredError());
+        try {
+            fillChartWith(converter.reconstruction(), "rekonstrukcja");
+            showMeanSquaredError(converter.meanSquaredError(),
+                    converter.signalNoiseRatio(),
+                    converter.peakSignalNoiseRatio(),
+                    converter.maximalDifference());
+        } catch (RuntimeException r) {
+            showErrorDialog("Aby zrekonstruowac sygnal nalezy wpierw przeprowadzic kwantyzacje");
+        }
     }
     //endregion
 
@@ -217,22 +251,25 @@ public class MainController implements Initializable {
     //region signalsFileOperations
     private void saveSignalToFile(Signal signal) {
         File file = fileChooser().showSaveDialog(App.getPrimaryStage());
-        try (FileOutputStream fileOutputStream = new FileOutputStream(Objects.requireNonNull(file).getAbsolutePath())) {
-            SerializationUtils.serialize(signal, fileOutputStream);
-        } catch (IOException e) {
-            showErrorDialog("Nie udalo sie zapisac sygnalu do pliku");
+        if (file != null) {
+            try (FileOutputStream fileOutputStream = new FileOutputStream(file.getAbsolutePath())) {
+                SerializationUtils.serialize(signal, fileOutputStream);
+            } catch (Exception e) {
+                showErrorDialog("Nie udalo sie zapisac sygnalu do pliku");
+            }
         }
-
     }
 
     private void loadSignalFromFile() {
         File file = fileChooser().showOpenDialog(App.getPrimaryStage());
-        try (FileInputStream fileInputStream = new FileInputStream(Objects.requireNonNull(file).getAbsolutePath())) {
-            Signal signal = SerializationUtils.deserialize(fileInputStream);
-            saveSignal(signal);
-            fillGuiWith(signal);
-        } catch (IOException e) {
-            showErrorDialog("Nie udalo się zaladowac sygnalu");
+        if (file != null) {
+            try (FileInputStream fileInputStream = new FileInputStream(file.getAbsolutePath())) {
+                Signal signal = SerializationUtils.deserialize(fileInputStream);
+                saveSignal(signal);
+                fillGuiWith(signal);
+            } catch (Exception e) {
+                showErrorDialog("Nie udalo się zaladowac sygnalu");
+            }
         }
     }
 
@@ -320,20 +357,26 @@ public class MainController implements Initializable {
         return Integer.valueOf(quantizationSampling.getText());
     }
 
-    private void showMeanSquaredError(double meanSquaredErrorValue){
-        meanSquaredError.setText("Blad sr. kwadratowy " + meanSquaredErrorValue);
+    private void showMeanSquaredError(double meanSquaredErrorValue,
+                                      double signalNoiseRatioValue,
+                                      double peakSignalNoiseRationValue,
+                                      double maximalDifferenceValue) {
+        meanSquaredError.setText("MSE: " + meanSquaredErrorValue);
+        signalNoiseRatio.setText("SNR: " + signalNoiseRatioValue);
+        peakSignalNoiseRation.setText("PSNR: " + peakSignalNoiseRationValue);
+        maximalDifference.setText("MD: " + maximalDifferenceValue);
     }
 
-    private List<Point> makeSteppedPoints(List<Point> points){
+    private List<Point> makeSteppedPoints(List<Point> points) {
         List<Point> steppedPoints = new ArrayList<>();
 
-        for(int i = 0; i < points.size() - 1; i++){
+        for (int i = 0;i < points.size() - 1;i++) {
             Point currentPoint = points.get(i);
-            Point nextPoint = points.get(i +1);
+            Point nextPoint = points.get(i + 1);
 
             steppedPoints.add(currentPoint);
 
-            double halfX = Math.abs(nextPoint.getX() + currentPoint.getX())/2.0;
+            double halfX = Math.abs(nextPoint.getX() + currentPoint.getX()) / 2.0;
 
             steppedPoints.add(new Point(halfX, currentPoint.getY()));
             steppedPoints.add(new Point(halfX, nextPoint.getY()));
