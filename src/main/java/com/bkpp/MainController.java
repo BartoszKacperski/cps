@@ -5,7 +5,10 @@ import com.bkpp.signals.*;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Service;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -70,6 +73,7 @@ public class MainController implements Initializable {
     private ResourceBundle resourceBundle;
     private ObservableList<Signal> generatedSignals;
     private Converter converter;
+    private Service<Signal> generateService;
 
     //region initializations
     @Override
@@ -78,7 +82,9 @@ public class MainController implements Initializable {
         initializeSignalsName();
         initializeSignalChoiceBox();
         initializeComboBoxBindings();
+        initService();
     }
+
 
     private void initializeSignalsName() {
         signalNames = new HashMap<>();
@@ -131,13 +137,11 @@ public class MainController implements Initializable {
     }
 
     public void generateSignal(ActionEvent actionEvent) {
-        try {
-            Signal pickedSignal = getInitializedPickedSignal();
-            saveSignal(pickedSignal);
-            fillGuiWith(pickedSignal);
-        } catch (NumberFormatException | IllegalAccessException e) {
-            showErrorDialog("Bledne dane wejsciowe");
+        if(generateService.isRunning()){
+            generateService.cancel();
         }
+        generateService.reset();
+        generateService.start();
     }
 
     public void clearChart(ActionEvent actionEvent) {
@@ -349,6 +353,7 @@ public class MainController implements Initializable {
         }
 
         chart.getData().add(series);
+
         addCheckBox("#" + (chart.getData().size() - 1));
     }
 
@@ -451,5 +456,33 @@ public class MainController implements Initializable {
         return steppedPoints;
     }
 
+    //endregion
+
+    //region async
+    private void initService(){
+        generateService = new Service<>() {
+            @Override
+            protected Task<Signal> createTask() {
+                return getGeneratingSignalTask();
+            }
+        };
+
+        generateService.setOnFailed(e-> {
+            showErrorDialog("Bledne dane wejsciowe");
+        });
+        generateService.setOnSucceeded(e -> {
+            saveSignal(generateService.getValue());
+            fillGuiWith(generateService.getValue());
+        });
+    }
+
+    private Task<Signal> getGeneratingSignalTask(){
+        return new Task<>() {
+            @Override
+            protected Signal call() throws Exception {
+                return getInitializedPickedSignal();
+            }
+        };
+    }
     //endregion
 }

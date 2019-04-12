@@ -1,86 +1,99 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.chart.LineChart?>
 <?import javafx.scene.chart.NumberAxis?>
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<HBox prefHeight="1000.0" prefWidth="1920.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.bkpp.MainController">
+<HBox prefHeight="1000.0" prefWidth="1920.0" xmlns="http://javafx.com/javafx/8.0.172-ea"
+      xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.bkpp.MainController">
     <VBox prefHeight="1000.0" prefWidth="180.0">
         <TitledPane expanded="false" prefWidth="200.0" text="Zapisz/Wczytaj">
             <VBox prefWidth="160">
-                <Button mnemonicParsing="false" onAction="#loadSignal" prefHeight="25.0" prefWidth="150.0" text="Wczytaj" />
-                <ComboBox fx:id="signalsToSave" prefHeight="25.0" prefWidth="150.0" />
-                <Button mnemonicParsing="false" onAction="#saveSignal" prefHeight="25.0" prefWidth="150.0" text="Zapisz" />
+                <Button mnemonicParsing="false" onAction="#loadSignal" prefHeight="25.0" prefWidth="150.0"
+                        text="Wczytaj"/>
+                <ComboBox fx:id="signalsToSave" prefHeight="25.0" prefWidth="150.0"/>
+                <Button mnemonicParsing="false" onAction="#saveSignal" prefHeight="25.0" prefWidth="150.0"
+                        text="Zapisz"/>
             </VBox>
         </TitledPane>
 
         <TitledPane expanded="false" prefWidth="200.0" text="Generuj">
             <VBox prefWidth="160">
-                <ComboBox fx:id="signalChoiceBox" onAction="#onSignalChosen" prefHeight="25.0" prefWidth="150.0" />
-                <VBox fx:id="parameters" />
-                <Button mnemonicParsing="false" onAction="#generateSignal" prefHeight="25.0" prefWidth="150.0" text="Generuj" />
+                <ComboBox fx:id="signalChoiceBox" onAction="#onSignalChosen" prefHeight="25.0" prefWidth="150.0"/>
+                <VBox fx:id="parameters"/>
+                <Button mnemonicParsing="false" onAction="#generateSignal" prefHeight="25.0" prefWidth="150.0"
+                        text="Generuj"/>
             </VBox>
         </TitledPane>
 
 
         <TitledPane expanded="false" prefWidth="200.0" text="Operacje">
             <VBox prefWidth="160">
-                <ComboBox fx:id="firstSignals" prefHeight="25.0" prefWidth="228.0" />
-                <ComboBox fx:id="secondSignals" prefHeight="25.0" prefWidth="210.0" />
-                <Button mnemonicParsing="false" onAction="#addSignals" prefHeight="25.0" prefWidth="150.0" text="Dodaj" />
-                <Button mnemonicParsing="false" onAction="#subtractSignals" prefHeight="25.0" prefWidth="150.0" text="Odejmij" />
-                <Button mnemonicParsing="false" onAction="#divideSignals" prefHeight="25.0" prefWidth="150.0" text="Podziel" />
-                <Button mnemonicParsing="false" onAction="#multiplySignals" prefHeight="25.0" prefWidth="150.0" text="Pomnóż" />
+                <ComboBox fx:id="firstSignals" prefHeight="25.0" prefWidth="228.0"/>
+                <ComboBox fx:id="secondSignals" prefHeight="25.0" prefWidth="210.0"/>
+                <Button mnemonicParsing="false" onAction="#addSignals" prefHeight="25.0" prefWidth="150.0"
+                        text="Dodaj"/>
+                <Button mnemonicParsing="false" onAction="#subtractSignals" prefHeight="25.0" prefWidth="150.0"
+                        text="Odejmij"/>
+                <Button mnemonicParsing="false" onAction="#divideSignals" prefHeight="25.0" prefWidth="150.0"
+                        text="Podziel"/>
+                <Button mnemonicParsing="false" onAction="#multiplySignals" prefHeight="25.0" prefWidth="150.0"
+                        text="Pomnóż"/>
             </VBox>
         </TitledPane>
 
         <TitledPane expanded="false" prefWidth="200.0" text="Wartosci">
             <VBox prefWidth="160">
-                <Label fx:id="avgValue" prefWidth="150.0" text="Wartosc srednia " wrapText="true" />
-                <Label fx:id="absoluteAvgValue" prefWidth="150.0" text="Bez. wart srednia" wrapText="true" />
-                <Label fx:id="power" prefWidth="150.0" text="Moc" wrapText="true" />
-                <Label fx:id="variance" prefWidth="150.0" text="Wariacja" wrapText="true" />
-                <Label fx:id="effectiveValue" prefWidth="150.0" text="Wartosc skuteczna" wrapText="true" />
+                <Label fx:id="avgValue" prefWidth="150.0" text="Wartosc srednia " wrapText="true"/>
+                <Label fx:id="absoluteAvgValue" prefWidth="150.0" text="Bez. wart srednia" wrapText="true"/>
+                <Label fx:id="power" prefWidth="150.0" text="Moc" wrapText="true"/>
+                <Label fx:id="variance" prefWidth="150.0" text="Wariacja" wrapText="true"/>
+                <Label fx:id="effectiveValue" prefWidth="150.0" text="Wartosc skuteczna" wrapText="true"/>
             </VBox>
         </TitledPane>
 
         <TitledPane expanded="false" prefWidth="200.0" text="Konwerter">
             <VBox prefWidth="160">
-                <ComboBox fx:id="signalsToQuantization" prefHeight="25.0" prefWidth="228.0" />
-                <Label prefWidth="160" text="Bity" />
-                <TextField fx:id="quantizationBytes" prefWidth="160.0" promptText="Bity" />
-                <Label prefWidth="160" text="Czestotliwosc probkowania" wrapText="true" />
-                <TextField fx:id="quantizationFrequency" prefWidth="160.0" promptText="Czestotliwosc" />
-                <Button mnemonicParsing="false" onAction="#sampling" prefHeight="25.0" prefWidth="150.0" text="Probkuj" />
-                <Button mnemonicParsing="false" onAction="#quantization" prefHeight="25.0" prefWidth="150.0" text="Kwantyzuj" />
-                <Label prefWidth="160" text="Liczba sasiednich probek" wrapText="true" />
-                <TextField fx:id="reconstructionNeighbour" prefWidth="160.0" promptText="Liczba sasiednich probek" />
-                <Button mnemonicParsing="false" onAction="#reconstruction" prefHeight="25.0" prefWidth="150.0" text="Rekonstruuj" />
+                <ComboBox fx:id="signalsToQuantization" prefHeight="25.0" prefWidth="228.0"/>
+                <Label prefWidth="160" text="Bity"/>
+                <TextField fx:id="quantizationBytes" prefWidth="160.0" promptText="Bity"/>
+                <Label prefWidth="160" text="Czestotliwosc probkowania" wrapText="true"/>
+                <TextField fx:id="quantizationFrequency" prefWidth="160.0" promptText="Czestotliwosc"/>
+                <Button mnemonicParsing="false" onAction="#sampling" prefHeight="25.0" prefWidth="150.0"
+                        text="Probkuj"/>
+                <Button mnemonicParsing="false" onAction="#quantization" prefHeight="25.0" prefWidth="150.0"
+                        text="Kwantyzuj"/>
+                <Label prefWidth="160" text="Liczba sasiednich probek" wrapText="true"/>
+                <TextField fx:id="reconstructionNeighbour" prefWidth="160.0" promptText="Liczba sasiednich probek"/>
+                <Button mnemonicParsing="false" onAction="#reconstruction" prefHeight="25.0" prefWidth="150.0"
+                        text="Rekonstruuj"/>
                 <TitledPane expanded="false" prefWidth="150" text="Bledy">
                     <VBox prefWidth="150">
-                        <Label fx:id="meanSquaredError" prefWidth="150.0" text="MSE: " wrapText="true" />
-                        <Label fx:id="signalNoiseRatio" prefWidth="150.0" text="SNR: " wrapText="true" />
-                        <Label fx:id="peakSignalNoiseRation" prefWidth="150.0" text="PSNR: " wrapText="true" />
-                        <Label fx:id="maximalDifference" prefWidth="150.0" text="MD: " wrapText="true" />
+                        <Label fx:id="meanSquaredError" prefWidth="150.0" text="MSE: " wrapText="true"/>
+                        <Label fx:id="signalNoiseRatio" prefWidth="150.0" text="SNR: " wrapText="true"/>
+                        <Label fx:id="peakSignalNoiseRation" prefWidth="150.0" text="PSNR: " wrapText="true"/>
+                        <Label fx:id="maximalDifference" prefWidth="150.0" text="MD: " wrapText="true"/>
                     </VBox>
                 </TitledPane>
             </VBox>
         </TitledPane>
-        <Button alignment="CENTER" mnemonicParsing="false" onAction="#clearChart" prefHeight="25.0" prefWidth="100.0" text="Wyczysc" />
+        <Button alignment="CENTER" mnemonicParsing="false" onAction="#clearChart" prefHeight="25.0" prefWidth="100.0"
+                text="Wyczysc"/>
     </VBox>
     <LineChart fx:id="chart" prefHeight="1000.0" prefWidth="1640.0">
         <xAxis>
-            <NumberAxis side="BOTTOM" />
+            <NumberAxis side="BOTTOM"/>
         </xAxis>
         <yAxis>
-            <NumberAxis side="LEFT" />
+            <NumberAxis side="LEFT"/>
         </yAxis>
     </LineChart>
     <VBox fx:id="chartToHide" prefWidth="100">

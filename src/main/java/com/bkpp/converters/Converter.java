@@ -8,8 +8,6 @@ import org.apache.commons.lang3.SerializationUtils;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 @Data
 
@@ -29,10 +27,11 @@ public class Converter {
 
     public List<Point> samplePoints(){
         Signal signalForSample = SerializationUtils.clone(signal);
+        sampledPoints = new ArrayList<>();
 
-        signalForSample.setFrequency(frequency);
-        signalForSample.computePoints();
-        sampledPoints = signalForSample.getPoints();
+        for(int i = 0; i/frequency < signalForSample.getDuration(); i++){
+            sampledPoints.add(new Point(i/frequency, signalForSample.getValue(i/frequency)));
+        }
 
         return sampledPoints;
     }
