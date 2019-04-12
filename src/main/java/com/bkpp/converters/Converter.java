@@ -2,8 +2,7 @@ package com.bkpp.converters;
 
 import com.bkpp.signals.Point;
 import com.bkpp.signals.Signal;
-import com.bkpp.signals.SignalUtils;
-import lombok.Data;
+import org.apache.commons.lang3.SerializationUtils;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -15,6 +14,7 @@ import java.util.stream.IntStream;
 public class Converter {
     private int bytes;
     private Signal signal;
+    private List<Point> sampledPoints;
     private List<Point> quantizedPoints;
     private List<Point> reconstructedPoints;
 
@@ -27,13 +27,22 @@ public class Converter {
         return IntStream.range(0, signalPoints.size())
                 .filter(n -> n % sampling == 0)
                 .mapToObj(signalPoints::get)
+                .map(SerializationUtils::clone)
                 .collect(Collectors.toList());
     }
 
-    public List<Point> quantization(double frequency){
+    public List<Point> samplePoints(double frequency){
         int sampling = Math.toIntExact(Math.round(signal.getFrequency() / frequency));
+        sampledPoints = new ArrayList<>(samplePoints(signal.getPoints(), sampling));
 
-        quantizedPoints = new ArrayList<>(samplePoints(signal.getPoints(), sampling));
+        return sampledPoints;
+    }
+
+    public List<Point> quantization(){
+        quantizedPoints = new ArrayList<>();
+        sampledPoints.forEach(p ->
+            quantizedPoints.add(SerializationUtils.clone(p))
+        );
 
         final double q = Math.pow(2.0, -(bytes - 1.0));
 
@@ -64,8 +73,8 @@ public class Converter {
 
     private double reconstructedValue(double t, double Ts){
         double sum = 0.0;
-        for(int i = 0; i < quantizedPoints.size(); i++){
-            sum += quantizedPoints.get(i).getY() * sinc(t/Ts - i);
+        for(int i = 0; i < sampledPoints.size(); i++){
+            sum += sampledPoints.get(i).getY() * sinc(t/Ts - i);
         }
 
         return sum;

@@ -47,6 +47,8 @@ public class MainController implements Initializable {
     @FXML
     Label effectiveValue;
     @FXML
+    CheckBox sampledChart;
+    @FXML
     CheckBox stepChart;
     @FXML
     Label meanSquaredError;
@@ -202,13 +204,18 @@ public class MainController implements Initializable {
 
         converter = new Converter(signal, bytes);
 
-        List<Point> quantizedPoints = converter.quantization(frequency);
+        List<Point> sampledPoints = converter.samplePoints(frequency);
+        List<Point> quantizedPoints = converter.quantization();
+
         if(stepChart.isSelected()){
-            fillChartWithoutPoints(makeSteppedPoints(quantizedPoints), "kwantyzacja");
+            fillChartWithoutPoints(makeSteppedPoints(quantizedPoints), "Kwantyzacja");
         } else {
             fillChartWithoutLines(quantizedPoints, "kwantyzacja");
         }
 
+        if(sampledChart.isSelected()){
+            fillChartWithoutLines(sampledPoints, "Probkowanie");
+        }
     }
 
     public void reconstruction(ActionEvent actionEvent) {
