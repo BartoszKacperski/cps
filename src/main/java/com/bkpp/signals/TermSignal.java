@@ -11,14 +11,14 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 
-public abstract class PeriodSignal extends Signal {
-    protected Double period;
+public abstract class TermSignal extends Signal {
+    protected Double term;
 
     @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
 
-        stringBuilder.append("Okres: ").append(period).append(" ");
+        stringBuilder.append("Okres: ").append(term).append(" ");
         stringBuilder.append(super.toString());
 
         return stringBuilder.toString();

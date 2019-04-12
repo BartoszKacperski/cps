@@ -1,16 +1,16 @@
 package com.bkpp.signals;
 
-public class TriangleSignal extends FillFactorPeriodSignal {
+public class TriangleSignal extends FillFactorTermSignal {
     @Override
     public Double getValue(Double t) {
-        super.k = (int)Math.floor(((t - startTime)/ period));
-        Double rangeStart =  super.k * period + super.startTime;
-        Double rangeEnd = super.period * (super.fillFactor + super.k) + startTime;
+        super.k = (int)Math.floor(((t - startTime)/ term));
+        Double rangeStart =  super.k * term + super.startTime;
+        Double rangeEnd = super.term * (super.fillFactor + super.k) + startTime;
 
         if(checkIfNumberInRange(t, rangeStart, rangeEnd)){
-            return (amplitude/(fillFactor * period)) * (t - k * period - startTime);
+            return (amplitude/(fillFactor * term)) * (t - k * term - startTime);
         } else{
-            return -amplitude/(period * (1 - fillFactor)) * (t - k * period - startTime) + amplitude/(1 - fillFactor);
+            return -amplitude/(term * (1 - fillFactor)) * (t - k * term - startTime) + amplitude/(1 - fillFactor);
         }
     }
 

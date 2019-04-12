@@ -2,6 +2,7 @@ package com.bkpp.converters;
 
 import com.bkpp.signals.Point;
 import com.bkpp.signals.Signal;
+import lombok.Data;
 import org.apache.commons.lang3.SerializationUtils;
 
 import java.util.ArrayList;
@@ -10,70 +11,86 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+@Data
 
 public class Converter {
     private int bytes;
+    private double frequency;
     private Signal signal;
     private List<Point> sampledPoints;
     private List<Point> quantizedPoints;
     private List<Point> reconstructedPoints;
 
-    public Converter(Signal signal, int bytes){
+    public Converter(Signal signal, double frequency, int bytes){
         this.signal = signal;
+        this.frequency = frequency;
         this.bytes = bytes;
     }
 
-    private List<Point> samplePoints(List<Point> signalPoints, int sampling) {
-        return IntStream.range(0, signalPoints.size())
-                .filter(n -> n % sampling == 0)
-                .mapToObj(signalPoints::get)
-                .map(SerializationUtils::clone)
-                .collect(Collectors.toList());
-    }
+    public List<Point> samplePoints(){
+        Signal signalForSample = SerializationUtils.clone(signal);
 
-    public List<Point> samplePoints(double frequency){
-        int sampling = Math.toIntExact(Math.round(signal.getFrequency() / frequency));
-        sampledPoints = new ArrayList<>(samplePoints(signal.getPoints(), sampling));
+        signalForSample.setFrequency(frequency);
+        signalForSample.computePoints();
+        sampledPoints = signalForSample.getPoints();
 
         return sampledPoints;
     }
 
     public List<Point> quantization(){
+        if(sampledPoints == null){
+            throw new IllegalStateException("Sample first");
+        }
         quantizedPoints = new ArrayList<>();
-        sampledPoints.forEach(p ->
-            quantizedPoints.add(SerializationUtils.clone(p))
-        );
 
-        final double q = Math.pow(2.0, -(bytes - 1.0));
+        final double q = Math.pow(2.0, -bytes + 1);
 
-        quantizedPoints.forEach(p -> {
-            double y = Math.floor((p.getY()/q) + 0.5) * q;
-            p.setY(y);
-        });
+        for(Point point : sampledPoints){
+            double x = point.getX();
+            double y = point.getY();
+
+            y = Math.floor((y/q) + 0.5) * q;
+
+            quantizedPoints.add(new Point(x, y));
+        }
+
 
         return quantizedPoints;
     }
 
-    public List<Point> reconstruction(){
-        if(quantizedPoints == null){
-            throw new IllegalStateException();
+    public List<Point> reconstruction(int neighbour){
+        if(sampledPoints == null){
+            throw new IllegalStateException("Sample first");
         }
 
         reconstructedPoints = new ArrayList<>();
-        double Ts = quantizedPoints.get(1).getX() - quantizedPoints.get(0).getX();
+        double Ts = 1.0/frequency;
 
         for(Point point : signal.getPoints()){
             double x = point.getX();
-            double value = reconstructedValue(x, Ts);
+            double value = reconstructedValue(x, Ts, neighbour);
             reconstructedPoints.add(new Point(x, value));
         }
 
         return reconstructedPoints;
     }
 
-    private double reconstructedValue(double t, double Ts){
+    private double reconstructedValue(double t, double Ts, int neighbour){
         double sum = 0.0;
-        for(int i = 0; i < sampledPoints.size(); i++){
+
+        Point closestPoint = sampledPoints
+                .stream()
+                .min((p1, p2) -> {
+                    double distance1 = Math.abs(p1.getX() - t);
+                    double distance2 = Math.abs(p2.getX() - t);
+                    return Double.compare(distance1, distance2);
+                }).get();
+
+        int indexOfClosest = sampledPoints.indexOf(closestPoint);
+        int startIndex = indexOfClosest - neighbour/2 < 0 ? 0 : indexOfClosest - neighbour/2;
+        int endIndex= indexOfClosest + neighbour/2 > sampledPoints.size() ? sampledPoints.size() : indexOfClosest + neighbour/2;
+
+        for(int i = startIndex; i < endIndex; i++){
             sum += sampledPoints.get(i).getY() * sinc(t/Ts - i);
         }
 
@@ -84,7 +101,6 @@ public class Converter {
         if(Math.abs(t - 0.0) < 1E-10){
             return 1.0;
         }
-
         return Math.sin(Math.PI * t)/(Math.PI * t);
     }
 
@@ -102,10 +118,16 @@ public class Converter {
     }
 
     public double meanSquaredError(){
+        if(reconstructedPoints == null){
+            throw new IllegalStateException("Reconstruct first");
+        }
         return squaredSum()/reconstructedPoints.size();
     }
 
     public double signalNoiseRatio(){
+        if(reconstructedPoints == null){
+            throw new IllegalStateException("Reconstruct first");
+        }
         double signalSum = 0.0;
 
         for(Point point : signal.getPoints()){
@@ -116,12 +138,18 @@ public class Converter {
     }
 
     public double peakSignalNoiseRatio(){
+        if(reconstructedPoints == null){
+            throw new IllegalStateException("Reconstruct first");
+        }
         double max = signal.getPoints().stream().max(Comparator.comparingDouble(Point::getY)).get().getY();
 
         return 10.0 * Math.log10(max/meanSquaredError());
     }
 
     public double maximalDifference(){
+        if(reconstructedPoints == null){
+            throw new IllegalStateException("Reconstruct first");
+        }
         double maxDifference = 0.0;
 
         for(int i = 0; i < reconstructedPoints.size() && i < signal.getPoints().size(); i++){

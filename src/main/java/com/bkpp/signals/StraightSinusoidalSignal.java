@@ -1,9 +1,9 @@
 package com.bkpp.signals;
 
-public class StraightSinusoidalSignal extends PeriodSignal {
+public class StraightSinusoidalSignal extends TermSignal {
     @Override
     public Double getValue(Double t) {
-        double value =(2.0 * Math.PI) / super.period * (t - super.startTime);
+        double value =(2.0 * Math.PI) / super.term * (t - super.startTime);
 
         return amplitude * Math.abs(Math.sin(value));
     }

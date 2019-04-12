@@ -1,10 +1,5 @@
 package com.bkpp.signals;
 
-import com.bkpp.signals.Point;
-import com.bkpp.signals.ResultSignal;
-import com.bkpp.signals.Signal;
-import com.bkpp.signals.PeriodSignal;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,20 +11,7 @@ public class SignalUtils {
     }
 
     public static Signal addition(Signal firstSignal, Signal secondSignal){
-        List<Point> firstPoints = firstSignal.getPoints();
-        List<Point> secondPoints = secondSignal.getPoints();
-        List<Point> sum = new ArrayList<>();
-
-        for(int i = 0; i < firstPoints.size() && i < secondPoints.size(); i++){
-            Point firstPoint = firstPoints.get(i);
-            Point secondPoint = secondPoints.get(i);
-
-            if(Math.abs(firstPoint.getX() - secondPoint.getX()) < 1E-10){
-                sum.add(new Point(firstPoint.getX(), firstPoint.getY() + secondPoint.getY()));
-            }
-        }
-
-        Signal sumSignal = new ResultSignal(sum, ResultSignal.Operation.addition);
+        Signal sumSignal = new ResultSignal(firstSignal, secondSignal, ResultSignal.Operation.addition);
         sumSignal.setAmplitude(firstSignal.getAmplitude() + secondSignal.getAmplitude());
         sumSignal.setDuration(firstSignal.getDuration());
         sumSignal.setFrequency(firstSignal.getFrequency());
@@ -39,20 +21,7 @@ public class SignalUtils {
     }
 
     public static Signal subtraction(Signal firstSignal, Signal secondSignal){
-        List<Point> firstPoints = firstSignal.getPoints();
-        List<Point> secondPoints = secondSignal.getPoints();
-        List<Point> difference = new ArrayList<>();
-
-        for(int i = 0; i < firstPoints.size() && i < secondPoints.size(); i++){
-            Point firstPoint = firstPoints.get(i);
-            Point secondPoint = secondPoints.get(i);
-
-            if(Math.abs(firstPoint.getX() - secondPoint.getX()) < 1E-10){
-                difference.add(new Point(firstPoint.getX(), firstPoint.getY() - secondPoint.getY()));
-            }
-        }
-
-        Signal differenceSignal = new ResultSignal(difference, ResultSignal.Operation.subtraction);
+        Signal differenceSignal = new ResultSignal(firstSignal, secondSignal, ResultSignal.Operation.subtraction);
         differenceSignal.setAmplitude(firstSignal.getAmplitude() - secondSignal.getAmplitude());
         differenceSignal.setDuration(firstSignal.getDuration());
         differenceSignal.setFrequency(firstSignal.getFrequency());
@@ -62,20 +31,7 @@ public class SignalUtils {
     }
 
     public static Signal multiplication(Signal firstSignal, Signal secondSignal){
-        List<Point> firstPoints = firstSignal.getPoints();
-        List<Point> secondPoints = secondSignal.getPoints();
-        List<Point> product = new ArrayList<>();
-
-        for(int i = 0; i < firstPoints.size() && i < secondPoints.size(); i++){
-            Point firstPoint = firstPoints.get(i);
-            Point secondPoint = secondPoints.get(i);
-
-            if(Math.abs(firstPoint.getX() - secondPoint.getX()) < 1E-10){
-                product.add(new Point(firstPoint.getX(), firstPoint.getY() * secondPoint.getY()));
-            }
-        }
-
-        Signal productSignal = new ResultSignal(product, ResultSignal.Operation.multiplication);
+        Signal productSignal = new ResultSignal(firstSignal, secondSignal, ResultSignal.Operation.multiplication);
         productSignal.setAmplitude(firstSignal.getAmplitude() - secondSignal.getAmplitude());
         productSignal.setDuration(firstSignal.getDuration());
         productSignal.setFrequency(firstSignal.getFrequency());
@@ -85,20 +41,8 @@ public class SignalUtils {
     }
 
     public static Signal division(Signal firstSignal, Signal secondSignal){
-        List<Point> firstPoints = firstSignal.getPoints();
-        List<Point> secondPoints = secondSignal.getPoints();
-        List<Point> quotient = new ArrayList<>();
 
-        for(int i = 0; i < firstPoints.size() && i < secondPoints.size(); i++){
-            Point firstPoint = firstPoints.get(i);
-            Point secondPoint = secondPoints.get(i);
-
-            if(Math.abs(firstPoint.getX() - secondPoint.getX()) < 1E-10 && secondPoint.getY() != 0){
-                quotient.add(new Point(firstPoint.getX(), firstPoint.getY() / secondPoint.getY()));
-            }
-        }
-
-        Signal quotientSignal = new ResultSignal(quotient, ResultSignal.Operation.division);
+        Signal quotientSignal = new ResultSignal(firstSignal, secondSignal, ResultSignal.Operation.division);
         quotientSignal.setAmplitude(firstSignal.getAmplitude() - secondSignal.getAmplitude());
         quotientSignal.setDuration(firstSignal.getDuration());
         quotientSignal.setFrequency(firstSignal.getFrequency());
@@ -108,9 +52,9 @@ public class SignalUtils {
     }
 
     private static List<Point> adjustPointsIfTermSignal(Signal signal){
-        if(signal instanceof PeriodSignal){
-            PeriodSignal periodSignal = (PeriodSignal)signal;
-            final double lastXInTerm = ((int)(periodSignal.getDuration()/ periodSignal.getPeriod()) * periodSignal.getPeriod());
+        if(signal instanceof TermSignal){
+            TermSignal termSignal = (TermSignal)signal;
+            final double lastXInTerm = ((int)(termSignal.getDuration()/ termSignal.getTerm()) * termSignal.getTerm());
 
             return signal.getPoints().stream().filter(point -> point.getX() <= lastXInTerm).collect(Collectors.toList());
         } else {

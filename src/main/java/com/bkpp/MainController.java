@@ -47,10 +47,6 @@ public class MainController implements Initializable {
     @FXML
     Label effectiveValue;
     @FXML
-    CheckBox sampledChart;
-    @FXML
-    CheckBox stepChart;
-    @FXML
     Label meanSquaredError;
     @FXML
     Label signalNoiseRatio;
@@ -61,9 +57,13 @@ public class MainController implements Initializable {
     @FXML
     LineChart<Double, Double> chart;
     @FXML
+    VBox chartToHide;
+    @FXML
     TextField quantizationBytes;
     @FXML
     TextField quantizationFrequency;
+    @FXML
+    TextField reconstructionNeighbour;
 
     private HashMap<String, Signal> signalNames;
     private DynamicParameters dynamicParameters;
@@ -197,36 +197,37 @@ public class MainController implements Initializable {
         parameters.getChildren().add(dynamicParameters);
     }
 
-    public void quantization(ActionEvent actionEvent) {
+    public void sampling(ActionEvent actionEvent){
         Signal signal = signalsToQuantization.getValue();
-        int bytes = getQuantizationBytes();
         double frequency = getQuantizationFrequency();
+        int bytes = getQuantizationBytes();
 
-        converter = new Converter(signal, bytes);
+        converter = new Converter(signal, frequency, bytes);
+        List<Point> sampledPoints = converter.samplePoints();
 
-        List<Point> sampledPoints = converter.samplePoints(frequency);
-        List<Point> quantizedPoints = converter.quantization();
+        fillChartWithoutLines(sampledPoints, "Probkowanie " + getConverterInfo());
+    }
 
-        if(stepChart.isSelected()){
-            fillChartWithoutPoints(makeSteppedPoints(quantizedPoints), "Kwantyzacja");
-        } else {
-            fillChartWithoutLines(quantizedPoints, "kwantyzacja");
-        }
+    public void quantization(ActionEvent actionEvent) {
+        try {
+            List<Point> quantizedPoints = converter.quantization();
 
-        if(sampledChart.isSelected()){
-            fillChartWithoutLines(sampledPoints, "Probkowanie");
+            fillChartWithoutPoints(makeSteppedPoints(quantizedPoints), "Kwantyzacja " + getConverterInfo());
+        } catch(RuntimeException r){
+            showErrorDialog("Aby przeprowadzic kwantyzacje naleze przeprowadzic probkowanie");
         }
     }
 
     public void reconstruction(ActionEvent actionEvent) {
         try {
-            fillChartWithoutPoints(converter.reconstruction(), "rekonstrukcja");
-            showMeanSquaredError(converter.meanSquaredError(),
+            int neighbour = getReconstructionNeighbour();
+            fillChartWithoutPoints(converter.reconstruction(neighbour), "Rekonstrukcja " + getConverterInfo() + " sasiedzi: " + neighbour);
+            showSignalsErrorMetrics(converter.meanSquaredError(),
                     converter.signalNoiseRatio(),
                     converter.peakSignalNoiseRatio(),
                     converter.maximalDifference());
         } catch (RuntimeException r) {
-            showErrorDialog("Aby zrekonstruowac sygnal nalezy wpierw przeprowadzic kwantyzacje");
+            showErrorDialog("Aby zrekonstruowac sygnal nalezy wpierw przeprowadzic probkowanie");
         }
     }
     //endregion
@@ -319,36 +320,61 @@ public class MainController implements Initializable {
     //region chart
     private void clearChart() {
         chart.getData().clear();
+        chartToHide.getChildren().clear();
     }
 
     private void fillChartWith(Signal signal) {
         fillChartWithoutPoints(signal.getPoints(), signal.toString());
     }
 
+    private void fillChartWithoutPoints(List<Point> points, String seriesName) {
+        fillChartWith(points, seriesName);
+        for (XYChart.Data data : chart.getData().get(chart.getData().size() - 1).getData()) {
+            data.getNode().setStyle("-fx-background-color: #00000000;");
+        }
+    }
+
+    private void fillChartWithoutLines(List<Point> points, String seriesName) {
+        fillChartWith(points, seriesName);
+        chart.getData().get(chart.getData().size() - 1).getNode().setStyle("-fx-stroke: transparent");
+    }
+
     private void fillChartWith(List<Point> points, String seriesName) {
         XYChart.Series<Double, Double> series = new XYChart.Series<>();
 
-        series.setName(seriesName);
+        series.setName("#" + chart.getData().size() + " " + seriesName);
 
         for (Point point : points) {
             series.getData().add(new XYChart.Data<>(point.getX(), point.getY()));
         }
 
         chart.getData().add(series);
+        addCheckBox("#" + (chart.getData().size() - 1));
     }
 
-    private void fillChartWithoutPoints(List<Point> points, String seriesName){
-        fillChartWith(points, seriesName);
-        for (XYChart.Data data : chart.getData().get(chart.getData().size() - 1).getData()) {
-            data.getNode().setStyle("-fx-background-color: #00000000;");
+    private void addCheckBox(String title) {
+        CheckBox checkBox = new CheckBox();
+        checkBox.setPrefSize(100, 40);
+        checkBox.setText(title);
+        checkBox.setSelected(true);
+
+        final int index = Integer.valueOf(title.replace("#", ""));
+        checkBox.selectedProperty().addListener((observableValue, aBoolean, t1) -> {
+            if (t1) {
+                changeVisibilityOfChartWith(index, true);
+            } else {
+                changeVisibilityOfChartWith(index, false);
+            }
+        });
+
+        chartToHide.getChildren().add(checkBox);
+    }
+
+    private void changeVisibilityOfChartWith(int index, boolean visibility) {
+        chart.getData().get(index).getNode().setVisible(visibility);
+        for (XYChart.Data data : chart.getData().get(index).getData()) {
+            data.getNode().setVisible(visibility);
         }
-
-    }
-
-    private void fillChartWithoutLines(List<Point> points, String seriesName) {
-        fillChartWith(points, seriesName);
-        chart.getData().get(chart.getData().size() - 1).getNode().setStyle("-fx-stroke: transparent");
-
     }
     //endregion
 
@@ -378,18 +404,27 @@ public class MainController implements Initializable {
     //endregion
 
     //region quantization
+    private String getConverterInfo(){
+        return "Czestotliwosc: " + converter.getFrequency() +
+                " bity: " + converter.getBytes();
+    }
+
     private int getQuantizationBytes() {
         return Integer.valueOf(quantizationBytes.getText());
     }
 
-    private int getQuantizationFrequency() {
+    private double getQuantizationFrequency() {
         return Integer.valueOf(quantizationFrequency.getText());
     }
 
-    private void showMeanSquaredError(double meanSquaredErrorValue,
-                                      double signalNoiseRatioValue,
-                                      double peakSignalNoiseRationValue,
-                                      double maximalDifferenceValue) {
+    private int getReconstructionNeighbour(){
+        return Integer.valueOf(reconstructionNeighbour.getText());
+    }
+
+    private void showSignalsErrorMetrics(double meanSquaredErrorValue,
+                                         double signalNoiseRatioValue,
+                                         double peakSignalNoiseRationValue,
+                                         double maximalDifferenceValue) {
         meanSquaredError.setText("MSE: " + meanSquaredErrorValue);
         signalNoiseRatio.setText("SNR: " + signalNoiseRatioValue);
         peakSignalNoiseRation.setText("PSNR: " + peakSignalNoiseRationValue);
