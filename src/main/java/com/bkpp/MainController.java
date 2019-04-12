@@ -204,7 +204,7 @@ public class MainController implements Initializable {
 
         List<Point> quantizedPoints = converter.quantization(frequency);
         if(stepChart.isSelected()){
-            fillChartWith(makeSteppedPoints(quantizedPoints), "kwantyzacja");
+            fillChartWithoutPoints(makeSteppedPoints(quantizedPoints), "kwantyzacja");
         } else {
             fillChartWithoutLines(quantizedPoints, "kwantyzacja");
         }
@@ -213,7 +213,7 @@ public class MainController implements Initializable {
 
     public void reconstruction(ActionEvent actionEvent) {
         try {
-            fillChartWith(converter.reconstruction(), "rekonstrukcja");
+            fillChartWithoutPoints(converter.reconstruction(), "rekonstrukcja");
             showMeanSquaredError(converter.meanSquaredError(),
                     converter.signalNoiseRatio(),
                     converter.peakSignalNoiseRatio(),
@@ -315,7 +315,7 @@ public class MainController implements Initializable {
     }
 
     private void fillChartWith(Signal signal) {
-        fillChartWith(signal.getPoints(), signal.toString());
+        fillChartWithoutPoints(signal.getPoints(), signal.toString());
     }
 
     private void fillChartWith(List<Point> points, String seriesName) {
@@ -328,6 +328,14 @@ public class MainController implements Initializable {
         }
 
         chart.getData().add(series);
+    }
+
+    private void fillChartWithoutPoints(List<Point> points, String seriesName){
+        fillChartWith(points, seriesName);
+        for (XYChart.Data data : chart.getData().get(chart.getData().size() - 1).getData()) {
+            data.getNode().setStyle("-fx-background-color: #00000000;");
+        }
+
     }
 
     private void fillChartWithoutLines(List<Point> points, String seriesName) {
