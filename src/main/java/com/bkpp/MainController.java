@@ -83,8 +83,13 @@ public class MainController implements Initializable {
         initializeSignalChoiceBox();
         initializeComboBoxBindings();
         initService();
+        test();
     }
 
+    private void test(){
+        List<Point> points = new ArrayList<>();
+        
+    }
 
     private void initializeSignalsName() {
         signalNames = new HashMap<>();
