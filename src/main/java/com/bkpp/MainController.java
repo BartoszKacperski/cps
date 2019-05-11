@@ -1,11 +1,11 @@
 package com.bkpp;
 
+import com.bkpp.antena.Antenna;
 import com.bkpp.converters.Converter;
 import com.bkpp.signals.*;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
@@ -20,13 +20,33 @@ import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.apache.commons.lang3.SerializationUtils;
+import com.bkpp.filters.*;
 
 import java.io.*;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class MainController implements Initializable {
+    @FXML
+    ComboBox<Signal> signalsToDistance;
+    @FXML
+    Label distance;
+    @FXML
+    TextField translation;
+    @FXML
+    TextField speed;
+    @FXML
+    ComboBox<Filter> filters;
+    @FXML
+    ComboBox<Window> windows;
+    @FXML
+    TextField filterFrequency;
+    @FXML
+    TextField filterM;
+    @FXML
+    ComboBox<Signal> signalsToFilter;
     @FXML
     VBox parameters;
     @FXML
@@ -83,13 +103,10 @@ public class MainController implements Initializable {
         initializeSignalChoiceBox();
         initializeComboBoxBindings();
         initService();
-        test();
+        initWindows();
+        initFilters();
     }
 
-    private void test(){
-        List<Point> points = new ArrayList<>();
-        
-    }
 
     private void initializeSignalsName() {
         signalNames = new HashMap<>();
@@ -122,7 +139,20 @@ public class MainController implements Initializable {
         firstSignals.itemsProperty().bind(listProperty);
         secondSignals.itemsProperty().bind(listProperty);
         signalsToQuantization.itemsProperty().bind(listProperty);
+        signalsToFilter.itemsProperty().bind(listProperty);
+        signalsToDistance.itemsProperty().bind(listProperty);
     }
+
+    private void initWindows() {
+        windows.getItems().add(new HanningWindow());
+        windows.getItems().add(new RectangularWindow());
+    }
+
+    private void initFilters() {
+        filters.getItems().add(new LowPassFilter());
+        filters.getItems().add(new HighPassFilter());
+    }
+
     //endregion
 
     //region onActions
@@ -142,7 +172,7 @@ public class MainController implements Initializable {
     }
 
     public void generateSignal(ActionEvent actionEvent) {
-        if(generateService.isRunning()){
+        if (generateService.isRunning()) {
             generateService.cancel();
         }
         generateService.reset();
@@ -198,6 +228,28 @@ public class MainController implements Initializable {
         }
     }
 
+    public void convulsion(ActionEvent actionEvent) {
+        Signal firstSignal = firstSignals.getValue();
+        Signal secondSignal = secondSignals.getValue();
+
+        if (firstSignal != null && secondSignal != null) {
+            saveResultOfOperation(SignalUtils.convolution(firstSignal, secondSignal));
+        } else {
+            showErrorDialog("Nalezy wybrac dwa sygnaly aby wykonac operacje");
+        }
+    }
+
+    public void correlation(ActionEvent actionEvent) {
+        Signal firstSignal = firstSignals.getValue();
+        Signal secondSignal = secondSignals.getValue();
+
+        if (firstSignal != null && secondSignal != null) {
+            saveResultOfOperation(SignalUtils.correlation(firstSignal, secondSignal));
+        } else {
+            showErrorDialog("Nalezy wybrac dwa sygnaly aby wykonac operacje");
+        }
+    }
+
     public void onSignalChosen(ActionEvent actionEvent) {
         Signal pickedSignal = signalNames.get(signalChoiceBox.getValue());
 
@@ -206,7 +258,7 @@ public class MainController implements Initializable {
         parameters.getChildren().add(dynamicParameters);
     }
 
-    public void sampling(ActionEvent actionEvent){
+    public void sampling(ActionEvent actionEvent) {
         Signal signal = signalsToQuantization.getValue();
         double frequency = getQuantizationFrequency();
         int bytes = getQuantizationBytes();
@@ -222,7 +274,7 @@ public class MainController implements Initializable {
             List<Point> quantizedPoints = converter.quantization();
 
             fillChartWithoutPoints(makeSteppedPoints(quantizedPoints), "Kwantyzacja " + getConverterInfo());
-        } catch(RuntimeException r){
+        } catch (RuntimeException r) {
             showErrorDialog("Aby przeprowadzic kwantyzacje naleze przeprowadzic probkowanie");
         }
     }
@@ -293,6 +345,7 @@ public class MainController implements Initializable {
                 saveSignal(signal);
                 fillGuiWith(signal);
             } catch (Exception e) {
+                e.printStackTrace();
                 showErrorDialog("Nie udalo się zaladowac sygnalu");
             }
         }
@@ -414,7 +467,7 @@ public class MainController implements Initializable {
     //endregion
 
     //region quantization
-    private String getConverterInfo(){
+    private String getConverterInfo() {
         return "Czestotliwosc: " + converter.getFrequency() +
                 " bity: " + converter.getBytes();
     }
@@ -427,7 +480,7 @@ public class MainController implements Initializable {
         return Integer.valueOf(quantizationFrequency.getText());
     }
 
-    private int getReconstructionNeighbour(){
+    private int getReconstructionNeighbour() {
         return Integer.valueOf(reconstructionNeighbour.getText());
     }
 
@@ -464,7 +517,7 @@ public class MainController implements Initializable {
     //endregion
 
     //region async
-    private void initService(){
+    private void initService() {
         generateService = new Service<>() {
             @Override
             protected Task<Signal> createTask() {
@@ -472,7 +525,7 @@ public class MainController implements Initializable {
             }
         };
 
-        generateService.setOnFailed(e-> {
+        generateService.setOnFailed(e -> {
             showErrorDialog("Bledne dane wejsciowe");
         });
         generateService.setOnSucceeded(e -> {
@@ -481,7 +534,7 @@ public class MainController implements Initializable {
         });
     }
 
-    private Task<Signal> getGeneratingSignalTask(){
+    private Task<Signal> getGeneratingSignalTask() {
         return new Task<>() {
             @Override
             protected Signal call() throws Exception {
@@ -489,5 +542,100 @@ public class MainController implements Initializable {
             }
         };
     }
+    //endregion
+
+    //region createFilter
+    private int getFilterM() {
+        return Integer.valueOf(filterM.getText());
+    }
+
+    private double getFilterFrequency() {
+        return Double.valueOf(filterFrequency.getText());
+    }
+
+    public void filtering(ActionEvent actionEvent) {
+        Signal chosenSignal = signalsToFilter.getValue();
+        Window window = windows.getValue();
+        Filter filter = filters.getValue();
+
+        Signal filterSignal = new FilterCreator(getFilterM(), getFilterFrequency(), chosenSignal).createFilter(window, filter);
+        Signal result = SignalUtils.convolution(filterSignal, chosenSignal);
+        fillChartWithoutPoints(suitResult(chosenSignal, result, filter), "Wynik filtracji");
+    }
+
+    private List<Point> suitResult(Signal chosenSignal, Signal result, Filter filter) {
+        double interval = (chosenSignal.getPoints().get(chosenSignal.getPoints().size() - 1).getX() - chosenSignal.getPoints().get(0).getX()) / (result.getPoints().size() - 1);
+        double currentX = 0.0;
+
+        //double amplitude = Collections.max(result.getPoints(), Comparator.comparingDouble(Point::getY)).getY() * 2.0;
+        //amplitude = Collections.max(chosenSignal.getPoints(), Comparator.comparingDouble(Point::getY)).getY()/amplitude;
+        System.out.println(result.getPoints());
+        List<Point> resultPoints = new ArrayList<>();
+        for (int i = 0;i < result.getPoints().size();i++) {
+            resultPoints.add(new Point(currentX, result.getPoints().get(i).getY()));
+            currentX += interval;
+        }
+
+        return resultPoints;
+    }
+
+
+    //endregion
+
+    //region antenna
+    Signal correlation;
+
+    private double getSpeed() {
+        return Double.valueOf(speed.getText());
+    }
+
+    private double getTranslation() {
+        return Double.valueOf(translation.getText());
+    }
+
+    public void startAntenna(ActionEvent actionEvent) {
+        Signal chosenSignal = signalsToDistance.getValue();
+        Antenna antenna = new Antenna(chosenSignal, getSpeed(), getTranslation());
+        Signal firstSignal = antenna.sendedSignal();
+        Signal secondSignal = antenna.receiveSignal();
+        correlation = SignalUtils.correlation(firstSignal, secondSignal);
+
+        fillChartWith(firstSignal);
+        fillChartWith(secondSignal);
+        distance.setText("Dystans: " + countDistance(correlation, getSpeed()));
+    }
+
+    public void drawCorrelation(ActionEvent actionEvent) {
+        fillChartWith(correlation);
+    }
+
+    private double countDistance(Signal correlation, double speed) {
+        int correlationHalfSize = correlation.getPoints().size() / 2;
+
+        List<Point> secondHalf = correlation.getPoints().stream().skip(correlationHalfSize).collect(Collectors.toList());
+
+        int index = maxYIndex(secondHalf);
+
+        double time = (correlationHalfSize - index) * (secondHalf.get(1).getX() - secondHalf.get(0).getX());
+
+        return speed * time / 2.0;
+    }
+
+    private int maxYIndex(List<Point> points) {
+        double maxY = points.get(0).getY();
+        int index = 0;
+
+        for (int i = 0;i < points.size();i++) {
+            Point currentPoint = points.get(i);
+            if (currentPoint.getY() > maxY) {
+                maxY = currentPoint.getY();
+                index = i;
+            }
+        }
+
+        return index;
+    }
+
+
     //endregion
 }

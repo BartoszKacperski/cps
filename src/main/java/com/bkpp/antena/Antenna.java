@@ -1,40 +1,46 @@
 package com.bkpp.antena;
 
-import com.bkpp.signals.SinusoidalSignal;
-import com.bkpp.signals.TermSignal;
+import com.bkpp.signals.*;
 import lombok.AllArgsConstructor;
-import com.bkpp.signals.Signal;
+import org.apache.commons.lang3.SerializationUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 
-public class Antena {
-    private final static double TERM = 2.0;
-    private final static double AMPLITUDE = 2.0;
-    private final static double DURATION = 2.0;
-    private final static double START_TIME = 0.0;
-    private final static double FREQUENCY = 2000;
+public class Antenna {
+    private Signal signal;
     private double speed;
     private double translation;
 
     public Signal sendedSignal(){
-        TermSignal sinus = new SinusoidalSignal();
-        sinus.setTerm(TERM);
-        sinus.setAmplitude(AMPLITUDE);
-        sinus.setDuration(DURATION);
-        sinus.setStartTime(START_TIME);
-        sinus.setFrequency(FREQUENCY);
-
-        return sinus;
+        return signal;
     }
 
     public Signal receiveSignal(){
-        TermSignal sinus = new SinusoidalSignal();
-        sinus.setTerm(TERM);
-        sinus.setAmplitude(AMPLITUDE);
-        sinus.setDuration(DURATION + translation);
-        sinus.setStartTime(START_TIME + translation);
-        sinus.setFrequency(FREQUENCY);
+        List<Point> pointList = new ArrayList<>();
+        int toSkip = (int) (translation/(signal.getPoints().get(1).getX() - signal.getPoints().get(0).getX()));
+        List<Point> skipped = signal.getPoints().stream().skip(toSkip).collect(Collectors.toList());
+        List<Point> limited = signal.getPoints().stream().limit(toSkip).collect(Collectors.toList());
 
-        return sinus;
+        int i;
+        for(i = 0; i < skipped.size(); i++){
+            double x = signal.getPoints().get(i).getX();
+            double y = skipped.get(i).getY();
+
+            pointList.add(new Point(x, y));
+        }
+
+        for(int j = 0; j < limited.size(); j++){
+            double x = signal.getPoints().get(i + j).getX();
+            double y = limited.get(j).getY();
+
+            pointList.add(new Point(x, y));
+        }
+
+
+        return new ResultSignal(pointList, ResultSignal.Operation.translation);
     }
 }

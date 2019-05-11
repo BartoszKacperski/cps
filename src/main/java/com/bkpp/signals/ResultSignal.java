@@ -1,17 +1,17 @@
 package com.bkpp.signals;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.*;
 
 import java.util.List;
 import java.util.function.DoubleBinaryOperator;
 
+@EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @Data
 
 public class ResultSignal extends Signal {
     public enum Operation {
-        multiplication("mnozenie"), addition("dodawanie"), division("dzielenie"), subtraction("odejmowanie");
+        multiplication("mnozenie"), addition("dodawanie"), division("dzielenie"), subtraction("odejmowanie"), convulsion("splot"), correlation("korelacja"), translation("przesuniecie");
 
         private String name;
 
@@ -27,10 +27,18 @@ public class ResultSignal extends Signal {
     private Operation operation;
     private Signal firstSignal;
     private Signal secondSignal;
+    @Setter
+    @Getter
+    private double term;
 
     public ResultSignal(Signal firstSignal, Signal secondSignal, Operation operation) {
         this.firstSignal = firstSignal;
         this.secondSignal = secondSignal;
+        this.operation = operation;
+    }
+
+    public ResultSignal(List<Point> points, Operation operation){
+        super.setPoints(points);
         this.operation = operation;
     }
 

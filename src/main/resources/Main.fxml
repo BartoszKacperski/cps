@@ -47,6 +47,10 @@
                         text="Podziel"/>
                 <Button mnemonicParsing="false" onAction="#multiplySignals" prefHeight="25.0" prefWidth="150.0"
                         text="Pomnóż"/>
+                <Button mnemonicParsing="false" onAction="#convulsion" prefHeight="25.0" prefWidth="150.0"
+                        text="Splot"/>
+                <Button mnemonicParsing="false" onAction="#correlation" prefHeight="25.0" prefWidth="150.0"
+                        text="Korelacja"/>
             </VBox>
         </TitledPane>
 
@@ -83,6 +87,33 @@
                         <Label fx:id="maximalDifference" prefWidth="150.0" text="MD: " wrapText="true"/>
                     </VBox>
                 </TitledPane>
+            </VBox>
+        </TitledPane>
+        <TitledPane expanded="false" prefWidth="200.0" text="Filtr">
+            <VBox prefWidth="160">
+                <ComboBox fx:id="signalsToFilter" prefHeight="25.0" prefWidth="228.0"/>
+                <ComboBox fx:id="filters" prefHeight="25.0" prefWidth="228.0"/>
+                <ComboBox fx:id="windows" prefHeight="25.0" prefWidth="228.0"/>
+                <Label prefWidth="160" text="M"/>
+                <TextField fx:id="filterM" prefWidth="160.0" promptText="M"/>
+                <Label prefWidth="160" text="Czestotliwosc odcięcia" wrapText="true"/>
+                <TextField fx:id="filterFrequency" prefWidth="160.0" promptText="Czestotliwosc"/>
+                <Button mnemonicParsing="false" onAction="#filtering" prefHeight="25.0" prefWidth="150.0"
+                        text="Filtruj"/>
+            </VBox>
+        </TitledPane>
+        <TitledPane expanded="false" prefWidth="200.0" text="Antena">
+            <VBox prefWidth="160">
+                <ComboBox fx:id="signalsToDistance" prefHeight="25.0" prefWidth="228.0"/>
+                <Label prefWidth="160" text="Przesuniecie"/>
+                <TextField fx:id="translation" prefWidth="160.0" promptText="Przesuniecie"/>
+                <Label prefWidth="160" text="Szybkosc fali" wrapText="true"/>
+                <TextField fx:id="speed" prefWidth="160.0" promptText="Szybkosc"/>
+                <Button mnemonicParsing="false" onAction="#startAntenna" prefHeight="25.0" prefWidth="160.0"
+                        text="Symuluuj"/>
+                <Button mnemonicParsing="false" onAction="#drawCorrelation" prefHeight="25.0" prefWidth="160.0"
+                        text="Rysuj korelacje"/>
+                <Label fx:id="distance" prefWidth="160" text="Dystans: "/>
             </VBox>
         </TitledPane>
         <Button alignment="CENTER" mnemonicParsing="false" onAction="#clearChart" prefHeight="25.0" prefWidth="100.0"
