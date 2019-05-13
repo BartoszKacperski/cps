@@ -602,21 +602,22 @@ public class MainController implements Initializable {
 
         fillChartWith(firstSignal);
         fillChartWith(secondSignal);
-        distance.setText("Dystans: " + countDistance(correlation, getSpeed()));
+        distance.setText("Dystans: " + countDistance(correlation, getSpeed(), chosenSignal));
     }
 
     public void drawCorrelation(ActionEvent actionEvent) {
         fillChartWith(correlation);
     }
 
-    private double countDistance(Signal correlation, double speed) {
+    private double countDistance(Signal correlation, double speed, Signal signal) {
         int correlationHalfSize = correlation.getPoints().size() / 2;
 
         List<Point> secondHalf = correlation.getPoints().stream().skip(correlationHalfSize).collect(Collectors.toList());
 
         int index = maxYIndex(secondHalf);
 
-        double time = (correlationHalfSize - index) * (secondHalf.get(1).getX() - secondHalf.get(0).getX());
+        double difference = (signal.getPoints().get(1).getX() - signal.getPoints().get(0).getX());
+        double time = (correlationHalfSize - index) * difference;
 
         return speed * time / 2.0;
     }

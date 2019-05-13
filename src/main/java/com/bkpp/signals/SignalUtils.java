@@ -177,8 +177,9 @@ public class SignalUtils {
         List<Point> firstPoints = firstSignal.getPoints();
         List<Point> secondPoints = secondSignal.getPoints();
         List<Point> resultPoints = new ArrayList<>();
-        int length = firstPoints.size() + secondPoints.size() - 1;
 
+        double currentTime = 0.0;
+        double interval = firstSignal.getPoints().get(1).getX() - firstSignal.getPoints().get(0).getX();
 
         for(int n = 1 - secondPoints.size(); n < firstPoints.size(); n++){
             double sum = 0.0;
@@ -191,7 +192,8 @@ public class SignalUtils {
                 sum += firstPoints.get(k).getY() * secondPoints.get(k - n).getY();
             }
 
-            resultPoints.add(new Point((double) n, sum));
+            currentTime += interval;
+            resultPoints.add(new Point(currentTime, sum));
         }
 
         return new ResultSignal(resultPoints, ResultSignal.Operation.correlation);
