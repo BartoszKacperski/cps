@@ -11,13 +11,16 @@ import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.apache.commons.lang3.SerializationUtils;
 import com.bkpp.filters.*;
@@ -605,8 +608,21 @@ public class MainController implements Initializable {
         distance.setText("Dystans: " + countDistance(correlation, getSpeed(), chosenSignal));
     }
 
-    public void drawCorrelation(ActionEvent actionEvent) {
-        fillChartWith(correlation);
+    public void drawCorrelation(ActionEvent actionEvent) throws IOException {
+        FXMLLoader loader = new FXMLLoader(App.class.getResource("/CorrelationDialog.fxml"));
+        Parent parent = loader.load();
+
+        CorrelationDialog correlationDialog = loader.getController();
+        correlationDialog.setCorrelation(correlation);
+        correlationDialog.drawCorrelation();
+
+
+        Scene scene = new Scene(parent, 1000, 600);
+        Stage stage = new Stage();
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.setScene(scene);
+        stage.setResizable(false);
+        stage.showAndWait();
     }
 
     private double countDistance(Signal correlation, double speed, Signal signal) {

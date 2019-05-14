@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.layout.AnchorPane?>
+<AnchorPane prefHeight="600.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8.0.172-ea"
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.bkpp.CorrelationDialog">
+    <LineChart fx:id="chart" prefHeight="600.0" prefWidth="1000.0">
+      <xAxis>
+          <NumberAxis side="BOTTOM"/>
+      </xAxis>
+      <yAxis>
+          <NumberAxis side="LEFT"/>
+      </yAxis>
+    </LineChart>
+</AnchorPane>
