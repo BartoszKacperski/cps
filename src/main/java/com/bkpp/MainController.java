@@ -652,7 +652,17 @@ public class MainController implements Initializable {
 
         return index;
     }
-
-
     //endregion
+
+    public void openTransforms(ActionEvent actionEvent) throws IOException {
+        FXMLLoader loader = new FXMLLoader(App.class.getResource("/Transforms.fxml"));
+        Parent parent = loader.load();
+
+        Scene scene = new Scene(parent);
+        Stage stage = new Stage();
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.setScene(scene);
+        stage.setResizable(false);
+        stage.showAndWait();
+    }
 }

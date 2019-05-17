@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Button?>
+<HBox prefHeight="900.0" prefWidth="1800.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.bkpp.TransformController">
+    <VBox prefHeight="900" prefWidth="200">
+        <Label alignment="CENTER" prefWidth="200" text="Sygnal" textAlignment="CENTER" />
+        <ComboBox fx:id="signals" prefWidth="200" />
+        <Label prefWidth="200" text="Częst. probkowania" alignment="CENTER"/>
+        <TextField fx:id="frequency" prefWidth="200" promptText="Czestotliwosc" text="16"/>
+        <Label prefWidth="200" text="Czas trwania" alignment="CENTER"/>
+        <TextField fx:id="duration" prefWidth="200" promptText="Czas trwania" text="4"/>
+        <Label alignment="CENTER" contentDisplay="CENTER" prefWidth="200" text="Transformata" textAlignment="CENTER" />
+        <ComboBox fx:id="transforms" prefWidth="200" />
+        <Button onAction="#transform" prefWidth="200" text="Transformuj"/>
+        <Label fx:id="executionTime" prefWidth="200" alignment="CENTER"/>
+    </VBox>
+    <VBox prefHeight="900.0" prefWidth="1600.0">
+        <LineChart fx:id="signalChart" prefHeight="300.0" prefWidth="1600.0">
+            <xAxis>
+                <NumberAxis side="BOTTOM"/>
+            </xAxis>
+            <yAxis>
+                <NumberAxis side="LEFT"/>
+            </yAxis>
+        </LineChart>
+        <LineChart fx:id="realChart" prefHeight="300.0" prefWidth="1600.0">
+            <xAxis>
+                <NumberAxis side="BOTTOM"/>
+            </xAxis>
+            <yAxis>
+                <NumberAxis side="LEFT"/>
+            </yAxis>
+        </LineChart>
+        <LineChart fx:id="imaginaryChart" prefHeight="300.0" prefWidth="1600.0">
+            <xAxis>
+                <NumberAxis side="BOTTOM"/>
+            </xAxis>
+            <yAxis>
+                <NumberAxis side="LEFT"/>
+            </yAxis>
+        </LineChart>
+    </VBox>
+</HBox>

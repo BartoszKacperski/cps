@@ -12,9 +12,9 @@ import java.util.List;
 
 public abstract class Signal implements Serializable {
     protected Double frequency = 1.0;
-    protected Double amplitude;
+    protected Double amplitude = 0.0;
     protected Double startTime = 0.0;
-    protected Double duration;
+    protected Double duration = 0.0;
     private List<Point> points;
 
 
