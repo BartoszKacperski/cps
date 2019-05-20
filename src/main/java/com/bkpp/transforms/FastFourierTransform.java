@@ -9,17 +9,20 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.bkpp.signals.Signal;
+
 public class FastFourierTransform implements Transform {
 
     @Override
-    public TransformResult transform(List<Double> list) {
+    public TransformResult transform(Signal signal) {
+        List<Double> list = CollectionsUtils.map(signal.getPoints());
         long startTime = System.nanoTime();
         Complex[] result = new FastFourierTransformer(DftNormalization.STANDARD).transform(CollectionsUtils.fromList(list), TransformType.FORWARD);
         long duration = System.nanoTime() - startTime;
 
         List<Complex> complexes = new ArrayList<>(Arrays.asList(result));
 
-        return new TransformResult(duration, complexes);
+        return new TransformResult(duration, complexes, signal);
     }
 
 

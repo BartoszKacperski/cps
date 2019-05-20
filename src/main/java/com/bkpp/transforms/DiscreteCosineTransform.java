@@ -1,6 +1,7 @@
 package com.bkpp.transforms;
 
 import org.apache.commons.math3.complex.Complex;
+import com.bkpp.signals.Signal;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,12 +9,14 @@ import java.util.List;
 public class DiscreteCosineTransform implements Transform {
 
     @Override
-    public TransformResult transform(List<Double> y) {
+    public TransformResult transform(Signal signal) {
+        List<Double> y = CollectionsUtils.map(signal.getPoints());
+
         long startTime = System.nanoTime();
         List<Complex> complexes = dct(y);
         long duration = System.nanoTime() - startTime;
 
-        return new TransformResult(duration, complexes);
+        return new TransformResult(duration, complexes, signal);
     }
 
     private List<Complex> dct(List<Double> y){

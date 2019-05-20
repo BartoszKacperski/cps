@@ -1,7 +1,7 @@
 package com.bkpp.transforms;
 
-import java.util.List;
+import com.bkpp.signals.Signal;
 
 public interface Transform {
-    TransformResult transform(List<Double> y);
+    TransformResult transform(Signal signal);
 }

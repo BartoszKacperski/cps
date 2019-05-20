@@ -1,13 +1,11 @@
 package com.bkpp;
 
 
-import com.bkpp.transforms.FastCosineTransform;
 import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import javafx.fxml.FXMLLoader;
 
-import java.util.Arrays;
 import java.util.ResourceBundle;
 
 /**

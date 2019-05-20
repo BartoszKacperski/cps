@@ -5,9 +5,12 @@ import org.apache.commons.math3.complex.Complex;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.bkpp.signals.Signal;
+
 public class DiscreteFourierTransform implements Transform {
     @Override
-    public TransformResult transform(List<Double> y) {
+    public TransformResult transform(Signal signal) {
+        List<Double> y = CollectionsUtils.map(signal.getPoints());
         double [] real = CollectionsUtils.fromList(y);
         double [] img = new double[y.size()];
 
@@ -15,7 +18,7 @@ public class DiscreteFourierTransform implements Transform {
         List<Complex> complexes = dft(real, img);
         long duration = System.nanoTime() - startTime;
 
-        return new TransformResult(duration, complexes);
+        return new TransformResult(duration, complexes, signal);
     }
 
     private List<Complex> dft(double[] real, double[] img) {

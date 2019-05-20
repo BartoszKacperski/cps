@@ -12,10 +12,17 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.stage.FileChooser;
+import org.apache.commons.lang3.SerializationUtils;
 import org.apache.commons.math3.complex.Complex;
 import org.apache.commons.math3.exception.MathIllegalArgumentException;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.net.URL;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -39,6 +46,7 @@ public class TransformController implements Initializable {
     @FXML
     LineChart<Double, Double> realChart;
 
+    private TransformResult currentResult;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -46,15 +54,34 @@ public class TransformController implements Initializable {
         initTransforms();
     }
 
-    public void transform(ActionEvent actionEvent) {
-        clearResults();
+    public void saveResult() {
+        if(currentResult != null){
+            try {
+                String filePath = fileChooser().showSaveDialog(App.getPrimaryStage()).getAbsolutePath();
+                SerializationUtils.serialize(currentResult, new FileOutputStream(new File(filePath)));
+            } catch (FileNotFoundException e) {
+                showErrorDialog("Nie udało się zapisać pliku");
+            }
+        }
+    }
+
+    public void openResult() {
+        try {
+            String filePath = fileChooser().showOpenDialog(App.getPrimaryStage()).getAbsolutePath();
+            currentResult = SerializationUtils.deserialize(new FileInputStream(new File(filePath)));
+            fillResults(currentResult);
+        } catch (FileNotFoundException e) {
+            showErrorDialog("Nie udało się zapisać pliku");
+        }
+    }
+
+    public void transform() {
         Transform transform = transforms.getValue();
         SinusoidalSignal signal = getInitializedSignal();
 
-
         try {
-            TransformResult transformResult = transform.transform(CollectionsUtils.map(signal.getPoints()));
-            fillResults(transformResult, signal);
+            currentResult = transform.transform(signal);
+            fillResults(currentResult);
         } catch (MathIllegalArgumentException e){
             showErrorDialog("Ilość próbek nie jest potęga liczby 2");
         }
@@ -114,8 +141,9 @@ public class TransformController implements Initializable {
         return Double.valueOf(frequency.getText());
     }
 
-    private void fillResults(TransformResult transformResult, Signal signal){
-        fillCharts(transformResult.getResult(), signal);
+    private void fillResults(TransformResult transformResult){
+        clearResults();
+        fillCharts(transformResult.getResult(), transformResult.getSignal());
 
         executionTime.setText("Czas wykonania: = " + transformResult.getExecutionTimeInMillis() + " ns");
     }
@@ -156,4 +184,15 @@ public class TransformController implements Initializable {
 
         chart.getData().add(series);
     }
+
+    private FileChooser fileChooser() {
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Wybierz plik");
+        File defaultDirectory = new File(Paths.get(".").toAbsolutePath().normalize().toString());
+        chooser.setInitialDirectory(defaultDirectory);
+
+        return chooser;
+    }
+
+
 }

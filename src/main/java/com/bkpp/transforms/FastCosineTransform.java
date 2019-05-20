@@ -1,18 +1,25 @@
 package com.bkpp.transforms;
 
+import com.bkpp.signals.Point;
+import com.bkpp.signals.Signal;
+import com.bkpp.signals.SinusoidalSignal;
 import org.apache.commons.math3.complex.Complex;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class FastCosineTransform implements Transform {
     @Override
-    public TransformResult transform(List<Double> y) {
+    public TransformResult transform(Signal signal) {
+        List<Double> y = CollectionsUtils.map(signal.getPoints());
+
         long startTime = System.nanoTime();
         List<Complex> complexes = fct(y);
         long duration = System.nanoTime() - startTime;
 
-        return new TransformResult(duration, complexes);
+        return new TransformResult(duration, complexes, signal);
     }
 
     private List<Complex> fct(List<Double> y){
@@ -29,7 +36,11 @@ public class FastCosineTransform implements Transform {
             tmp[halfSize] = y.get(size - 1);
         }
 
-        List<Complex> complexes = new FastFourierTransform().transform(CollectionsUtils.toList(tmp)).getResult();
+        List<Point> points = Arrays.stream(tmp).mapToObj(value -> new Point(0.0, value)).collect(Collectors.toList());
+        Signal signal = new SinusoidalSignal();
+        signal.setPoints(points);
+
+        List<Complex> complexes = new FastFourierTransform().transform(signal).getResult();
         List<Complex> result = new ArrayList<>();
 
         for(int i = 0; i < size; i++) {
